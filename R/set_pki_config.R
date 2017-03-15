@@ -26,8 +26,7 @@ set_pki_config <- function(cacert = NULL, p12_file = NULL) {
     stop("PKI file not recognized. File must be PKCS#12 formatted and have a .p12 or .pfx file extension")
   }
 
-  #p12 <- openssl::read_p12(p12_file, password = getPass::getPass("Please enter your PKI Password: "))
-  p12 <- openssl::read_p12(p12_file, password = "fred")
+  p12 <- openssl::read_p12(p12_file, password = getPass::getPass("Please enter your PKI Password: "))
 
   # write out cert to temp files
   cert_file = tempfile()

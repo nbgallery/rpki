@@ -1,0 +1,22 @@
+Package: rpki
+Type: Package
+Title: A wrapper around the httr package to make it easier to access PKI-enabled services with R
+Version: 0.1.0
+Authors@R: person("nbgallery", email = "nbgallery@github.com", role = c("aut", "cre"))
+Description: A wrapper around the httr package to make it easier to access
+    PKI-enabled services with R. Conceptually, rpki is very similar to the
+    Ruby MyPKI package and Python pypki2 package, and is intended to use the
+    same ~/.mypki configuration file.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1.9000
+Depends:
+    R (>= 3.3.0),
+    httr (>= 1.2.1)
+Imports:
+    openssl (>= 0.9.6),
+    getPass (>= 0.1-1),
+    jsonlite (>= 1.3),
+    tools
+URL: https://github.com/nbgallery/rpki

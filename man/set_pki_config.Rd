@@ -4,25 +4,27 @@
 \alias{set_pki_config}
 \title{Set httr config parameters}
 \usage{
-set_pki_config(cacert = NULL, p12_file = NULL)
+set_pki_config(ca_bundle = NULL, p12_file = NULL, password = NULL)
 }
 \arguments{
-\item{cacert}{string: the absolute file path to a Certificate Authority (CA) bundle (.crt).}
+\item{ca_bundle}{string: the absolute file path to a Certificate Authority (CA) bundle (.crt).}
 
 \item{p12_file}{string: the absolute file path to a PKCS#12 certificate (.p12 or .pfx)}
+
+\item{password}{string: the passphrase used to encrypt the private key of p12_file}
 }
 \description{
-This is the main wrapper function used to override configuration settings used by the httr paclage.
+This is the main wrapper function used to override configuration settings used by the httr package.
 }
 \details{
-When the package is first loaded via the library() call, rpki attempts to search for and use a pre-existing .mypki configuration file. If not found or the file is determined to be invalid, the user will be prompted for file paths to a certificate authority bundle and a PKI file. The certificate and private key are extracted from a PKCS#12 file and used to define the following httr package config settings: cainfo, sslcert, and sslkey
+This function should only be called when automatic configuration via the library() call is not desired. A .mypki file will be generated and verified for correctness. The certificate and private key are extracted from a PKCS#12 file and used to define the following httr package config settings: cainfo, sslcert, and sslkey
 }
 \examples{
 library(rpki)
 GET('https://your.pki.enabled.website/path/to/whatever')
 
 # When manual configuration is desired
-rpki::set_pki_config(cacert="/path/to/certificate_authority.crt", p12_file="/path/to/pki.p12")
+rpki::set_pki_config(ca_bundle="/path/to/certificate_authority.crt", p12_file="/path/to/my/pki.p12", password="my_pki_passphrase")
 GET('https://your.pki.enabled.website/path/to/whatever')
 
 }

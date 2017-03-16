@@ -1,46 +1,40 @@
 #' Set httr config parameters
 #'
-#' This is the main wrapper function used to override configuration settings used by the httr paclage.
+#' This is the main wrapper function used to override configuration settings used by the httr package.
 #'
-#' When the package is first loaded via the library() call, rpki attempts to search for and use a pre-existing .mypki configuration file. If not found or the file is determined to be invalid, the user will be prompted for file paths to a certificate authority bundle and a PKI file. The certificate and private key are extracted from a PKCS#12 file and used to define the following httr package config settings: cainfo, sslcert, and sslkey
+#' This function should only be called when automatic configuration via the library() call is not desired. A .mypki file will be generated and verified for correctness. The certificate and private key are extracted from a PKCS#12 file and used to define the following httr package config settings: cainfo, sslcert, and sslkey
 #'
-#' @param cacert string: the absolute file path to a Certificate Authority (CA) bundle (.crt).
+#' @param ca_bundle string: the absolute file path to a Certificate Authority (CA) bundle (.crt).
 #' @param p12_file string: the absolute file path to a PKCS#12 certificate (.p12 or .pfx)
+#' @param password string: the passphrase used to encrypt the private key of p12_file
 #' @export
 #' @examples
 #' library(rpki)
 #' GET('https://your.pki.enabled.website/path/to/whatever')
 #'
 #' # When manual configuration is desired
-#' rpki::set_pki_config(cacert="/path/to/certificate_authority.crt", p12_file="/path/to/pki.p12")
+#' rpki::set_pki_config(ca_bundle="/path/to/certificate_authority.crt", p12_file="/path/to/my/pki.p12", password="my_pki_passphrase")
 #' GET('https://your.pki.enabled.website/path/to/whatever')
 #'
-
-set_pki_config <- function(cacert = NULL, p12_file = NULL) {
+set_pki_config <- function(ca_bundle = NULL, p12_file = NULL, password = NULL) {
   # check arguments
-  if(any(is.null(cacert), is.null(p12_file), typeof(cacert) != "character", typeof(p12_file) != "character"))
-    stop("Unexpected arguments passed to set_pki_config(). Consult documentation.")
+  if(any(is.null(ca_bundle), is.null(p12_file), typeof(ca_bundle) != "character", typeof(p12_file) != "character"))
+    stop("Unexpected arguments. CA bundle and PKI must be specified at minimum. Consult documentation.")
 
-  # use openssl package to convert p12/pfx pki file to pem files for httr to use
-  if ( !(tools::file_ext(p12_file) %in% c("p12","pfx")) ) {
-    stop("PKI file not recognized. File must be PKCS#12 formatted and have a .p12 or .pfx file extension")
+  # write mypki file and check its validity
+  mypki <- get_config_path()
+  write_mypki(mypki_file=mypki, ca_file=ca_bundle, pki_file=p12_file)
+  if(!is_valid_mypki(mypki))
+    stop("Invalid file paths.")
+
+
+  if (is.null(password))
+    make_pki_config(ca_bundle, p12_file)
+  else {
+    if (!is.character(password))
+      stop("password argument not recognized. Must be a string")
+    make_pki_config(ca_bundle, p12_file, password)
   }
-
-  p12 <- openssl::read_p12(p12_file, password = getPass::getPass("Please enter your PKI Password: "))
-
-  # write out cert to temp files
-  cert_file = tempfile()
-  openssl::write_pem(p12$cert, path=cert_file)
-
-  # write out private key in pkcs#8 format
-  key_file = tempfile()
-  openssl::write_pem(x=p12$key, path=key_file)
-
-  # set httr config arguments globally so PKI authentication persists for the whole R session
-    # cainfo = certificate authority (CA) file (.crt)
-    # sslcert = certificate file (.pem)
-    # sslkey = keyfile (.key but PEM formatted)
-  httr::set_config(httr::config(cainfo=cacert, sslcert=cert_file, sslkey=key_file, sslcerttype="PEM"))
 }
 
 
@@ -56,5 +50,5 @@ set_pki_config <- function(cacert = NULL, p12_file = NULL) {
 
   # set pki config options
   json_data <- jsonlite::fromJSON(txt = mypki_file)
-  set_pki_config(json_data$ca, json_data$p12$path)
+  make_pki_config(json_data$ca, json_data$p12$path)
 }

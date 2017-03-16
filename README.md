@@ -21,4 +21,4 @@ rpki::set_pki_config(ca_bundle="/path/to/certificate_authority.crt",
                      password="my_pki_passphrase")
 GET('https://your.pki.enabled.website/path/to/whatever')
 ```
-Note that exeucting the code `library(rpki)` triggers the automatic configuration process. For manual configuration, you must **not** attach the package.
+Note that executing the line `library(rpki)` triggers the automatic configuration process. For manual configuration, do **not** attach the package.

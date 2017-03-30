@@ -1,6 +1,5 @@
-
-write_mypki <- function(mypki_file, ca_file, pki_file) {
+write_mypki <- function(mypki_path, ca_path, pki_path) {
   # write file paths to mypki file
-  x <- list(ca=ca_file, p12=list(path=pki_file))
-  write(jsonlite::toJSON(x), file=mypki_file)
+  l <- list(ca = ca_path, p12 = list(path = pki_path))
+  write(jsonlite::toJSON(l), file = mypki_path)
 }

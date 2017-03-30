@@ -24,7 +24,9 @@ library(rpki)
 GET('https://your.pki.enabled.website/path/to/whatever')
 
 # When manual configuration is desired
-rpki::set_pki_config(ca_bundle="/path/to/certificate_authority.crt", p12_file="/path/to/my/pki.p12", password="my_pki_passphrase")
+rpki::set_pki_config(ca_bundle="/path/to/certificate_authority.crt",
+                     p12_file="/path/to/my/pki.p12",
+                     password="my_pki_passphrase")
 GET('https://your.pki.enabled.website/path/to/whatever')
 
 }

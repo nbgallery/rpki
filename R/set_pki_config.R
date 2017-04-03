@@ -7,6 +7,7 @@
 #' @param ca_bundle string: the absolute file path to a Certificate Authority (CA) bundle (.crt).
 #' @param p12_file string: the absolute file path to a PKCS#12 certificate (.p12 or .pfx)
 #' @param password string: the passphrase used to encrypt the private key of p12_file
+#' @import httr
 #' @export
 #' @examples
 #' library(rpki)
@@ -33,7 +34,6 @@ set_pki_config <- function(ca_bundle = NULL, p12_file = NULL, password = NULL) {
     stop('Invalid file paths.')
   set_httr_config(ca_bundle, p12_file, password)
 }
-
 
 .onAttach <- function(libname, pkgname) {
   # automatically called when package is attached (via library())

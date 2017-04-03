@@ -1,3 +1,5 @@
+#' @import openssl
+#' @importFrom getPass getPass
 set_httr_config <- function(cacert = NULL, p12_file = NULL, pass = NULL) {
   if (is.null(pass)) {
     p12 <- read_p12(p12_file,

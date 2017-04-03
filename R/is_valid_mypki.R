@@ -1,5 +1,6 @@
 # check for mypki file existence and check that the file
 # has valid config parameters
+#' @importFrom tools file_ext
 is_valid_mypki <- function(path) {
   # check that mypki file exists
   if (!file.exists(path)) {
@@ -27,7 +28,7 @@ is_valid_mypki <- function(path) {
     warning('Certifate Authority (CA) bundle file not found')
     return(FALSE)
   }
-  if (!tools::file_ext(json_data$ca) == 'crt') {
+  if (!file_ext(json_data$ca) == 'crt') {
     warning('Certificate Authority bundle must have .crt file extension. Do you have the right file format?')
     return(FALSE)
   }
@@ -41,7 +42,7 @@ is_valid_mypki <- function(path) {
     warning('PKI file not found')
     return(FALSE)
   }
-  if (!tools::file_ext(json_data$p12$path) %in% c('p12','pfx')) {
+  if (!file_ext(json_data$p12$path) %in% c('p12','pfx')) {
     warning('PKI certificate must be in p12 format.')
     return(FALSE)
   }

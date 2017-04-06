@@ -39,12 +39,15 @@ set_pki_config <- function(ca_bundle = NULL, p12_file = NULL, password = NULL) {
   # automatically called when package is attached (via library())
   mypki_file <- get_mypki_path()
 
+  created <- FALSE
   if (!is_valid_mypki(mypki_file)) {
     packageStartupMessage(paste0('Invalid mypki configuration. Creating new file at ', mypki_file))
-    create_mypki(mypki_file)
+    created <- create_mypki(mypki_file)
   }
 
   # set pki config options
-  json_data <- jsonlite::fromJSON(txt = mypki_file)
-  set_httr_config(json_data$ca, json_data$p12$path)
+  if (created) {
+    json_data <- jsonlite::fromJSON(txt = mypki_file)
+    set_httr_config(json_data$ca, json_data$p12$path)
+  }
 }

@@ -41,5 +41,19 @@ is_valid_mypki <- function(path, password = NULL) {
     warning('PKI file not found.')
     return(FALSE)
   }
+  if (!is.null(password)) {
+    bad_password = TRUE
+    if ((typeof(password) == 'character') & (length(password) ==1)) {
+      tryCatch({
+        read_p12(file = json_data$p12$path, password = password)
+          bad_password = FALSE
+        },
+        error = function(e) warning('Incorrect password.')
+      )
+    } else
+      warning('Incorrect password format.')
+    if (bad_password)
+      return(FALSE)
+  }
   TRUE
 }

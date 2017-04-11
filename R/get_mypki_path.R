@@ -7,10 +7,10 @@ get_mypki_path <- function() {
     if (home_dir == '') warning('Could not find USERPROFILE environment variable.')
   }
   # Get home directory in Linux/Mac
-  if (.Platform$OS.type == 'unix') { # works for both linux and Mac OS
+  if (.Platform$OS.type == 'unix') {
     home_dir = Sys.getenv('HOME')
     if (home_dir == '') warning('Could not find HOME environment variable.')
   }
-  if (home_dir == '') stop()
+  if (home_dir == '') stop('Could not determine home directory.') # this should never happen
   path <- paste0(home_dir, .Platform$file.sep, '.mypki')
 }

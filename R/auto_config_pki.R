@@ -12,14 +12,14 @@
 #'
 auto_config_pki <- function() {
   mypki_file <- get_mypki_path()
-  valid <- is_valid_mypki(mypki_file)
+  valid <- is_valid_mypki(file = mypki_file)
   if (!valid) {
     warning('Invalid mypki configuration.')
-    valid <- create_mypki(mypki_file)
+    valid <- create_mypki(file = mypki_file)
   }
   # set pki config options
   if (valid) {
     json_data <- jsonlite::fromJSON(txt = mypki_file)
-    set_httr_config(cacert = json_data$ca, pki_file = json_data$p12$path)
+    set_httr_config(ca_file = json_data$ca, pki_file = json_data$p12$path)
   }
 }

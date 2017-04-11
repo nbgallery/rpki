@@ -2,39 +2,39 @@
 # has valid config parameters
 #' @importFrom tools file_ext
 #' @import openssl
-is_valid_mypki <- function(path, password = NULL) {
+is_valid_mypki <- function(file, password = NULL) {
   # verify mypki exist
-  if (!file.exists(path)) {
-    warning(paste0(path, ' not found.'))
+  if (!file.exists(file)) {
+    warning(paste0(file, ' not found.'))
     return(FALSE)
   }
 
   # verify format of mypki file (json)
   json_data <- tryCatch(
-    jsonlite::fromJSON(txt = path),
+    jsonlite::fromJSON(txt = file),
     error = function(e) {
-      warning(paste0('Malformed ', path, ' file.'))
+      warning(paste0('Malformed ', file, ' file.'))
       return(FALSE)
     }
   )
 
   # verify the Certificate Authority bundle
   if (!('ca' %in% names(json_data))) {
-    warning('File path for Certifate Authority (CA) bundle not specified.')
+    warning(paste0('Certifate Authority (CA) file not specified in ', file))
     return(FALSE)
   }
   if (!(file.exists(json_data$ca))) {
-    warning('Certifate Authority (CA) bundle file not found.')
+    warning('Certifate Authority (CA) file not found.')
     return(FALSE)
   }
   if(length(read_pem(file = json_data$ca)) == 0) {
-    warning('Unrecognized Certifate Authority (CA) bundle file format.')
+    warning('Unrecognized Certifate Authority (CA) file format.')
     return(FALSE)
   }
 
   # verify the PKI certificate
   if (!('p12' %in% names(json_data) && "path" %in% names(json_data$p12))) {
-    warning('File path for PKI certificate not specified.')
+    warning(paste0('PKI file not specified in ', file))
     return(FALSE)
   }
   if (!file.exists(json_data$p12$path)) {

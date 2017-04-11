@@ -1,6 +1,6 @@
 #' @import openssl
 #' @importFrom getPass getPass
-set_httr_config <- function(cacert = NULL, pki_file = NULL, pass = NULL) {
+set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
   p12 <- tryCatch(
     if (is.null(pass)) {
       read_p12(file = pki_file, password = getPass('Enter PKI Password: '))
@@ -24,7 +24,7 @@ set_httr_config <- function(cacert = NULL, pki_file = NULL, pass = NULL) {
   #   cainfo: certificate authority (CA) file (.crt)
   #   sslcert: certificate file (.pem)
   #   sslkey: keyfile (.key but PEM formatted)
-  httr::set_config(httr::config(cainfo = cacert,
+  httr::set_config(httr::config(cainfo = ca_file,
                                 sslcert = cert_file,
                                 sslkey = key_file))
 }

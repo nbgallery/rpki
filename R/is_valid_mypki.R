@@ -1,6 +1,5 @@
 # check for mypki file existence and check that the file
 # has valid config parameters
-#' @importFrom tools file_ext
 #' @import openssl
 is_valid_mypki <- function(file, password = NULL) {
   # verify mypki exist
@@ -27,7 +26,7 @@ is_valid_mypki <- function(file, password = NULL) {
     warning('Certifate Authority (CA) file not found.')
     return(FALSE)
   }
-  if(length(read_pem(file = json_data$ca)) == 0) {
+  if(length(read_cert_bundle(file = json_data$ca)) == 0) {
     warning('Unrecognized Certifate Authority (CA) file format.')
     return(FALSE)
   }

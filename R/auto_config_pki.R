@@ -1,8 +1,8 @@
 #' Set httr config parameters
 #'
-#' This is a wrapper function that automatically overrides configuration settings used by the httr package to allow working with PKI-enabled web services.
+#' A wrapper function that automatically overrides configuration settings used by the httr package to allow working with PKI-enabled web services.
 #'
-#' This function should be called for automatic configuration. The PKI certificate and private key are extracted from a PKCS#12 file and used to define the following httr package config settings: cainfo, sslcert, and sslkey
+#' This function should be called for automatic configuration. The PKI certificate and private key are extracted from a PKCS#12-formatted PKI file and used to define the following httr config settings: cainfo, sslcert, sslkey
 #' @import httr
 #' @export
 #' @examples

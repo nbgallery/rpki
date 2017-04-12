@@ -4,29 +4,29 @@
 \alias{manual_config_pki}
 \title{Set httr config parameters}
 \usage{
-manual_config_pki(ca_file = NULL, pki_file = NULL, password = NULL)
+manual_config_pki(mypki_file = "HOME/.mypki", ca_file = NULL,
+  pki_file = NULL, password = NULL)
 }
 \arguments{
-\item{ca_file}{string: the absolute file path to a Certificate Authority (CA) bundle (.crt).}
+\item{mypki_file}{string: absolute file path to save mypki configuration file. Defaults to the home directory}
 
-\item{pki_file}{string: the absolute file path to a pki certificate (.p12 or .pfx)}
+\item{ca_file}{string: absolute file path to a Certificate Authority (CA) bundle}
 
-\item{password}{string: the passphrase used to encrypt the private key of p12_file}
+\item{pki_file}{string: absolute file path to a pki certificate (.p12 or .pfx)}
+
+\item{password}{string: passphrase used to encrypt the private key of p12_file}
 }
 \description{
-This is a wrapper function used to manually override configuration settings used by the httr package.
+A wrapper function that overrides configuration settings used by the httr package using a specified PKI certificate and Certificate Authority (CA) bundle.
 }
 \details{
-This function should be used when automatic configuration is not desired. A mypki file will be generated and verified for correctness. The certificate and private key are extracted from a PKCS#12 file and used to define the following httr package config settings: cainfo, sslcert, and sslkey
+This function should only be used when automatic configuration is not desired. A mypki file will be generated and verified for correctness. The certificate and private key are extracted from a PKCS#12-formatted PKI file and used to define the following httr config settings: cainfo, sslcert, sslkey
 }
 \examples{
 library(rpki)
-GET('https://your.pki.enabled.website/path/to/whatever')
-
-# When manual configuration is desired
-rpki::manual_config_pki(ca_file="/path/to/certificate_authority.crt",
-                     p12_file="/path/to/my/pki.p12",
-                     password="my_pki_passphrase")
+manual_config_pki(ca_file = '/path/to/certificate_authority.crt',
+                  p12_file = 'path/to/my/pki.p12',
+                  password = 'my_pki_passphrase')
 GET('https://your.pki.enabled.website/path/to/whatever')
 
 }

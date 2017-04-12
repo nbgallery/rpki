@@ -8,7 +8,7 @@ set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
       read_p12(file = pki_file, password = pass)
     },
     error = function(e) {
-      stop('Unrecognized PKI file format or incorrect password.')
+      stop('Incorrect password or unrecognized PKI file format.')
     }
   )
 

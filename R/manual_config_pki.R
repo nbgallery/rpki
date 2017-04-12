@@ -34,7 +34,7 @@ manual_config_pki <- function(mypki_file = 'HOME/.mypki',
   write_mypki(mypki_file = mypki_file, ca_file = ca_file, pki_file = pki_file)
   if (!is_valid_mypki(mypki_file, password)) {
     file.remove(mypki_file)
-    stop()
+    stop('PKI configuration not set for httr')
   }
 
   set_httr_config(ca_file = ca_file, pki_file = pki_file, pass = password)

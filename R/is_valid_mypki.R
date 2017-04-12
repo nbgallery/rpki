@@ -4,7 +4,7 @@
 is_valid_mypki <- function(file, password = NULL) {
   # verify mypki exist
   if (!file.exists(file)) {
-    warning(paste0(file, ' not found.'))
+    message(paste0(file, ' not found.'))
     return(FALSE)
   }
 
@@ -12,32 +12,32 @@ is_valid_mypki <- function(file, password = NULL) {
   json_data <- tryCatch(
     jsonlite::fromJSON(txt = file),
     error = function(e) {
-      warning(paste0('Malformed ', file, ' file.'))
+      message(paste0('Malformed ', file, ' file.'))
       return(FALSE)
     }
   )
 
   # verify the Certificate Authority bundle
   if (!('ca' %in% names(json_data))) {
-    warning(paste0('Certifate Authority (CA) file not specified in ', file))
+    message(paste0('Certifate Authority (CA) file not specified in ', file))
     return(FALSE)
   }
   if (!(file.exists(json_data$ca))) {
-    warning('Certifate Authority (CA) file not found.')
+    message('Certifate Authority (CA) file not found.')
     return(FALSE)
   }
   if(length(read_cert_bundle(file = json_data$ca)) == 0) {
-    warning('Unrecognized Certifate Authority (CA) file format.')
+    message('Unrecognized Certifate Authority (CA) file format.')
     return(FALSE)
   }
 
   # verify the PKI certificate
   if (!('p12' %in% names(json_data) && "path" %in% names(json_data$p12))) {
-    warning(paste0('PKI file not specified in ', file))
+    message(paste0('PKI file not specified in ', file))
     return(FALSE)
   }
   if (!file.exists(json_data$p12$path)) {
-    warning('PKI file not found.')
+    message('PKI file not found.')
     return(FALSE)
   }
   if (!is.null(password)) {
@@ -50,7 +50,7 @@ is_valid_mypki <- function(file, password = NULL) {
         error = function(e) warning('Incorrect password.')
       )
     } else
-      warning('Incorrect password format.')
+      message('Incorrect password format.')
     if (bad_password)
       return(FALSE)
   }

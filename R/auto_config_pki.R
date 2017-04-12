@@ -14,12 +14,13 @@ auto_config_pki <- function() {
   mypki_file <- get_mypki_path()
   valid <- is_valid_mypki(file = mypki_file)
   if (!valid) {
-    warning('Invalid mypki configuration.')
+    message('Invalid mypki configuration.')
     valid <- create_mypki(file = mypki_file)
   }
   # set pki config options
   if (valid) {
     json_data <- jsonlite::fromJSON(txt = mypki_file)
     set_httr_config(ca_file = json_data$ca, pki_file = json_data$p12$path)
-  }
+  } else
+    stop('PKI configuration not set for httr')
 }

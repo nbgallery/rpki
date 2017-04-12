@@ -44,10 +44,10 @@ is_valid_mypki <- function(file, password = NULL) {
     bad_password = TRUE
     if ((typeof(password) == 'character') & (length(password) ==1)) {
       tryCatch({
-        read_p12(file = json_data$p12$path, password = password)
+          read_p12(file = json_data$p12$path, password = password)
           bad_password = FALSE
         },
-        error = function(e) warning('Incorrect password.')
+        error = function(e) message('Incorrect password.')
       )
     } else
       message('Incorrect password format.')

@@ -3,6 +3,9 @@
 #' @import openssl
 is_valid_mypki <- function(file, password = NULL) {
   # verify mypki exist
+  ## TODO
+  ##   file.exist() fails on valid file paths in windows when dealing with
+  ##   network file locations. Will require more testing for a workaround.
   if (!file.exists(file)) {
     message(paste0(file, ' not found.'))
     return(FALSE)

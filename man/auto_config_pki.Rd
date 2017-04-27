@@ -4,7 +4,10 @@
 \alias{auto_config_pki}
 \title{Set httr config parameters}
 \usage{
-auto_config_pki()
+auto_config_pki(password = NULL)
+}
+\arguments{
+\item{password}{string: passphrase used to encrypt the private key of p12_file. Optional argument that defaults to NULL.}
 }
 \description{
 A wrapper function that automatically overrides configuration settings used by the httr package to allow working with PKI-enabled web services.

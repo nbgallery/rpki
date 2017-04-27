@@ -4,8 +4,8 @@
 \alias{manual_config_pki}
 \title{Set httr config parameters}
 \usage{
-manual_config_pki(mypki_file = "HOME/.mypki", ca_file = NULL,
-  pki_file = NULL, password = NULL)
+manual_config_pki(mypki_file = NULL, ca_file = NULL, pki_file = NULL,
+  password = NULL)
 }
 \arguments{
 \item{mypki_file}{string: absolute file path to save mypki configuration file. Defaults to the home directory}
@@ -14,7 +14,7 @@ manual_config_pki(mypki_file = "HOME/.mypki", ca_file = NULL,
 
 \item{pki_file}{string: absolute file path to a pki certificate (.p12 or .pfx)}
 
-\item{password}{string: passphrase used to encrypt the private key of p12_file}
+\item{password}{string: passphrase used to encrypt the private key of p12_file. Optional argument that defaults to NULL.}
 }
 \description{
 A wrapper function that overrides configuration settings used by the httr package using a specified PKI certificate and Certificate Authority (CA) bundle.

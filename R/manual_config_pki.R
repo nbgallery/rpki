@@ -7,7 +7,7 @@
 #' @param mypki_file string: absolute file path to save mypki configuration file. Defaults to the home directory
 #' @param ca_file string: absolute file path to a Certificate Authority (CA) bundle
 #' @param pki_file string: absolute file path to a pki certificate (.p12 or .pfx)
-#' @param password string: passphrase used to encrypt the private key of p12_file
+#' @param password string: passphrase used to encrypt the private key of p12_file. Optional argument that defaults to NULL.
 #' @import httr
 #' @export
 #' @examples
@@ -17,7 +17,7 @@
 #'                   password = 'my_pki_passphrase')
 #' GET('https://your.pki.enabled.website/path/to/whatever')
 #'
-manual_config_pki <- function(mypki_file = 'HOME/.mypki',
+manual_config_pki <- function(mypki_file = NULL,
                               ca_file = NULL,
                               pki_file = NULL,
                               password = NULL) {
@@ -30,9 +30,9 @@ manual_config_pki <- function(mypki_file = 'HOME/.mypki',
     stop('Unexpected arguments. CA bundle and PKI must be specified at minimum.')
 
   # verify mypki file
-  mypki_file = ifelse(mypki_file == 'HOME/.mypki', get_mypki_path(), mypki_file)
+  mypki_file = ifelse(is.null(mypki_file), get_mypki_path(), mypki_file)
   write_mypki(mypki_file = mypki_file, ca_file = ca_file, pki_file = pki_file)
-  if (!is_valid_mypki(mypki_file, password)) {
+  if (!is_valid_mypki(file = mypki_file, password = password)) {
     file.remove(mypki_file)
     stop('PKI configuration not set for httr')
   }

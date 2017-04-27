@@ -11,7 +11,13 @@ rpki can run in both interactive and non-interactive R sessions. The default beh
 ### Fetching a URL
 ```r
 library(rpki)
-auto_config_pki() # will prompt for pki passphrase
+auto_config_pki() # will prompt for pki passphrase if necessary
+GET("https://your.pki.enabled.website/path/to/whatever")
+```
+#### Explicitly provide the pki passphrase
+```r
+library(rpki)
+auto_config_pki(password = "my_pki_passphrase") # will not prompt for pki passphrase
 GET("https://your.pki.enabled.website/path/to/whatever")
 ```
 ### Manual Configuration
@@ -19,16 +25,16 @@ GET("https://your.pki.enabled.website/path/to/whatever")
 Configuration options can be defined explicitly to overwrite previous settings.
 ```r
 library(rpki)
-manual_config_pki(ca_bundle="/path/to/certificate_authority.crt",
-                  pki_file="/path/to/my/pki.p12")
+manual_config_pki(ca_bundle = "/path/to/certificate_authority.crt",
+                  pki_file  = "/path/to/my/pki.p12")
 GET('https://your.pki.enabled.website/path/to/whatever')
 ```
 #### Non-interactive Sessions
-rpki can run in non-interactive sessions when the pki passphrase is explicitly provided.
+rpki can run in non-interactive sessions as well when the pki passphrase is explicitly provided.
 ```r
 library(rpki)
-manual_config_pki(ca_bundle="/path/to/certificate_authority.crt",
-                  pki_file="/path/to/my/pki.p12",
-                  password="my_pki_passphrase")
+manual_config_pki(ca_bundle = "/path/to/certificate_authority.crt",
+                  pki_file  = "/path/to/my/pki.p12",
+                  password  = "my_pki_passphrase")
 GET('https://your.pki.enabled.website/path/to/whatever')
 ```

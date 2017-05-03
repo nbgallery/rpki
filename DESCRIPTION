@@ -1,13 +1,17 @@
 Package: rpki
-Type: Package
-Title: A PKI-enabled wrapper around httr
-Version: 0.1.0
-Authors@R: person("Joshua", "Bradley", , "jgbradley1@gmail.com", role = c("aut", "cre"))
-Description: A PKI-enabled wrapper around the httr package. Conceptually, rpki
-    is very similar to the Ruby MyPKI package and Python pypki2 package, and
-    is intended to use the same mypki configuration file.
+Title: A PKI-enabled wrapper around the 'httr' package
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Joshua", "Bradley", , "jgbradley1@gmail.com", role = c("aut", "cre")),
+    person("nbgallery", role = "cph")
+    )
+Description: A wrapper that configures the 'httr' package for use in
+    PKI-authenticated services. Conceptually similar to the Ruby 'MyPKI'
+    package and Python 'pypki2' package, this package uses the same
+    mypki configuration file. It is part of the nbgallery Jupyter software
+    suite. Configuration functions make it easy to use in other environments
+    besides Jupyter.
 License: MIT + file LICENSE
-Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1.9000
 Depends:
@@ -19,4 +23,4 @@ Imports:
     jsonlite (>= 1.3),
     tools (>= 3.3.0),
     stringr (>= 1.2.0)
-URL: https://github.com/nbgallery/rpki
+URL: https://github.com/nbgallery/rpki, https://github.com/nbgallery

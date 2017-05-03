@@ -1,15 +1,19 @@
 #' Set httr config parameters
 #'
-#' A wrapper function that automatically overrides configuration settings used by the httr package to allow working with PKI-enabled web services.
+#' Override configuration settings used by the 'httr' package to allow working with PKI-enabled web services.
 #'
-#' This function should be called for automatic configuration. The PKI certificate and private key are extracted from a PKCS#12-formatted PKI file and used to define the following httr config settings: cainfo, sslcert, sslkey
-#' @param password string: passphrase used to encrypt the private key of p12_file. Optional argument that defaults to NULL.
+#' Default mypki configuration settings will be used. If no password is provided (\code{password = NULL}), the PKI certificate specified by the mypki configuration file is assumed to be unencrypted. The PKI certificate file must be in PKCS#12 format. The following 'httr' config settings get modified: cainfo, sslcert, sslkey.
+#'
+#' If a mypki configuration file cannot be found, users are prompted for file paths to both a PKI certificate and a Certificate Authority (CA) bundle.
+#' @param password string: passphrase used to encrypt/decrypt the private key of a PKI certificate
 #' @import httr
 #' @export
 #' @examples
+#' \dontrun{
 #' library(rpki)
 #' auto_config_pki()
 #' GET('https://your.pki.enabled.website/path/to/whatever')
+#' }
 #'
 auto_config_pki <- function(password = NULL) {
   mypki_file <- get_mypki_path()

@@ -1,26 +1,28 @@
 #' Set httr config parameters
 #'
-#' A wrapper function that overrides configuration settings used by the httr package using a specified PKI certificate and Certificate Authority (CA) bundle.
+#' Override configuration settings used by the 'httr' package to allow working with PKI-enabled web services, based on the supplied arguments.
 #'
-#' This function should only be used when automatic configuration is not desired. A mypki file will be generated and verified for correctness. The certificate and private key are extracted from a PKCS#12-formatted PKI file and used to define the following httr config settings: cainfo, sslcert, sslkey
+#' This function should only be used when default arguments are not desired using \code{auto_config_pki()}. A mypki file is generated based on the file paths of a PKI certificate and Certificate Authority bundle. At a minimum, \code{pki_file} and \code{ca_file} must be specified. If \code{mypki_file} is not specified, a mypki configuration file is generated in the user's home directory. The PKI certificate must be in PKCS#12 format. The following 'httr' config settings get modified: cainfo, sslcert, sslkey
 #'
-#' @param mypki_file string: absolute file path to save mypki configuration file. Defaults to the home directory
+#' @param pki_file string: absolute file path to a pki certificate
 #' @param ca_file string: absolute file path to a Certificate Authority (CA) bundle
-#' @param pki_file string: absolute file path to a pki certificate (.p12 or .pfx)
-#' @param password string: passphrase used to encrypt the private key of p12_file. Optional argument that defaults to NULL.
+#' @param password string: passphrase used to encrypt/decrypt the private key of the pki certificate
+#' @param mypki_file string: absolute file path to save mypki configuration file. Defaults to the home directory
 #' @import httr
 #' @export
 #' @examples
+#' \dontrun{
 #' library(rpki)
-#' manual_config_pki(ca_file = '/path/to/certificate_authority.crt',
-#'                   p12_file = 'path/to/my/pki.p12',
+#' manual_config_pki(pki_file = 'path/to/my/pki.p12',
+#'                   ca_file = '/path/to/certificate_authority.crt',
 #'                   password = 'my_pki_passphrase')
 #' GET('https://your.pki.enabled.website/path/to/whatever')
+#' }
 #'
-manual_config_pki <- function(mypki_file = NULL,
+manual_config_pki <- function(pki_file = NULL,
                               ca_file = NULL,
-                              pki_file = NULL,
-                              password = NULL) {
+                              password = NULL,
+                              mypki_file = NULL) {
   # check arguments
   if (any(typeof(ca_file) != 'character',
           length(ca_file) != 1,

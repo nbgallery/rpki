@@ -1,0 +1,6 @@
+{
+  "ca": "root-ca.crt",
+  "p12": {
+    "path": "fred.p12"
+  }
+}

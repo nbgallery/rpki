@@ -8,9 +8,9 @@ Authors@R: c(
 Description: A wrapper that configures the 'httr' package for use in
     PKI-authenticated services. Conceptually similar to the Ruby 'MyPKI'
     package and Python 'pypki2' package, this package uses the same
-    mypki configuration file. It is part of the nbgallery Jupyter software
+    mypki configuration file. It is part of the nbgallery 'Jupyter' software
     suite. Configuration functions make it easy to use in other environments
-    besides Jupyter.
+    besides 'Jupyter'.
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 6.0.1.9000
@@ -23,4 +23,6 @@ Imports:
     jsonlite (>= 1.3),
     tools (>= 3.3.0),
     stringr (>= 1.2.0)
+Suggests: testthat (>= 1.0.2)
 URL: https://github.com/nbgallery/rpki, https://github.com/nbgallery
+Suggests: testthat

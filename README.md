@@ -2,10 +2,21 @@
 rpki is a wrapper package that PKI-enables the httr package. Conceptually, rpki is similar to the Ruby [MyPKI](https://github.com/nbgallery/mypki) package and Python [pypki2](https://github.com/nbgallery/pypki2) package, and is intended to use the same mypki configuration file.
 
 ## Details
-rpki can run in both interactive and non-interactive R sessions. The default behavior of rpki is to override the config() settings of httr using the PKI settings found in a .mypki configuration file. It will attempt to search for and use a pre-existing .mypki configuration file located in the home directory (~/.mypki). If the configuration file is not found or is invalid, the user will be prompted for file paths to a certificate authority bundle and a PKI file. rpki sets the following httr config settings
+rpki can run in both interactive and non-interactive R sessions. The default behavior of rpki is to override the config() settings of httr using the PKI settings found in a .mypki configuration file. It will attempt to search for and use a pre-existing .mypki configuration file located in the home directory (~/.mypki). If the configuration file is not found or is invalid (wrong format, nonexistent file paths, .etc), the user will be prompted for file paths to a certificate authority bundle and a PKI file. rpki sets the following httr config settings
 * cainfo
 * sslcert
 * sslkey
+
+### mypki Configuration File
+rpki expects a mypki configuration file to be json formatted and at minimum specify the absolute file paths to a Certificate Authority (CA) bundle and a PKCS12 digital certificate.
+```json
+{
+  "ca": "/path/to/certificate_authority_bundle.crt",
+  "p12": {
+    "path": "/path/to/pki_digital_certificate.p12"
+  }
+}
+```
 
 ## Examples
 ### Fetching a URL

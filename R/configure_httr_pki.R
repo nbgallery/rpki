@@ -39,5 +39,4 @@ configure_httr_pki <- function(mypki_file = NULL,
     stop(paste0('Invalid mypki configuration at ', mypki_file, '. Set overwrite = TRUE'))
   json_data <- jsonlite::fromJSON(txt = mypki_file)
   set_httr_config(ca_file = json_data$ca, pki_file = json_data$p12$path, pass = password)
-  TRUE
 }

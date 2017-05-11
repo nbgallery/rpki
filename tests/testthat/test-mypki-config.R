@@ -11,20 +11,20 @@ test_that('Verify whether or not a mypki file is valid', {
 
 test_that('Using a pre-existing mypki file to set httr_options', {
   mypki <- 'sample_valid_mypki.txt'
-  ret <- configure_httr_pki(mypki_file = mypki, password = p12.password)
+  configure_httr_pki(mypki_file = mypki, password = p12.password)
 
-  expect_true(ret)
+  expect_false(is.null(getOption('httr_config')))
   reset_config()
 })
 
 test_that('Force the creation of a new mypki file', {
   mypki <- tempfile()
-  ret <- configure_httr_pki(mypki_file = mypki,
-                            pki_file = p12.file,
-                            ca_file = ca.file,
-                            password = p12.password,
-                            overwrite = TRUE)
-  expect_true(ret)
+  configure_httr_pki(mypki_file = mypki,
+                     pki_file = p12.file,
+                     ca_file = ca.file,
+                     password = p12.password,
+                     overwrite = TRUE)
+  expect_true(is_valid_mypki(mypki))
   reset_config()
 })
 

@@ -38,5 +38,29 @@ configure_httr_pki <- function(mypki_file = NULL,
   if (!valid)
     stop(paste0('Invalid mypki configuration at ', mypki_file, '. Set overwrite = TRUE'))
   json_data <- jsonlite::fromJSON(txt = mypki_file)
+
+  # clean up the configuration environment when session ends
+  reg.finalizer(globalenv(), environment_cleanup, onexit = TRUE)
+
+  # make httr configuration changes
   set_httr_config(ca_file = json_data$ca, pki_file = json_data$p12$path, pass = password)
+}
+
+
+.onDetach <- function(libpath) { package_cleanup() }
+.onUnload <- function(libpath) { package_cleanup() }
+environment_cleanup <- function(e) { package_cleanup() }
+
+package_cleanup <- function() {
+  if (!is.null(getOption('httr_config'))) {
+    if (length(getOption('httr_config')$options) > 0) {
+      result <- tryCatch({
+        f <- c(getOption('httr_config')$options$sslcert,
+               getOption('httr_config')$options$sslkey);
+        file.remove(f);
+      })
+    }
+  }
+  if (isNamespaceLoaded('httr'))
+    httr::reset_config()
 }

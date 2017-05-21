@@ -47,3 +47,19 @@ test_that('the certificate authority bundle set by httr_options matches the CA b
   expect_identical(my.cert.bundle, read_cert_bundle(ca.file))
   reset_config()
 })
+
+test_that('the cert and key files are removed when the package is detached', {
+  mypki <- tempfile()
+  configure_httr_pki(mypki_file = mypki,
+                     pki_file = p12.file,
+                     ca_file = ca.file,
+                     password = p12.password,
+                     overwrite = TRUE)
+  old.configuration <- getOption('httr_config')$options
+  detach('package:rpki', character.only = TRUE)
+  my.opt <- getOption('httr_config')$options
+  expect_length(my.opt, 0)
+  expect_false(file.exists(old.configuration$sslcert))
+  expect_false(file.exists(old.configuration$sslkey))
+  reset_config()
+})

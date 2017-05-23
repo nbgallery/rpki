@@ -1,6 +1,6 @@
 Package: rpki
 Title: A PKI-Enabled Wrapper Around the 'Httr' Package
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: c(
     person("Joshua", "Bradley", , "jgbradley1@gmail.com", role = c("aut", "cre")),
     person("nbgallery", role = "cph")

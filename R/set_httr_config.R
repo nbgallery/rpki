@@ -3,9 +3,9 @@
 set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
   p12 <- tryCatch(
     if (is.null(pass)) {
-      read_p12(file = pki_file, password = getPass('Enter PKI Password: '))
+      read_p12(file = pki_file, pass <- getPass('Enter PKI Password: '))
     } else {
-      read_p12(file = pki_file, password = pass)
+      read_p12(file = pki_file, pass)
     },
     error = function(e) {
       stop('Incorrect password or unrecognized PKI file format.')
@@ -24,6 +24,7 @@ set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
   #   cainfo: certificate authority (CA) file (.crt)
   #   sslcert: certificate file (.pem)
   #   sslkey: keyfile (.key but PEM formatted)
+  #   keypasswd: pki passphrase
   httr::set_config(httr::config(cainfo = ca_file,
                                 sslcert = cert_file,
                                 sslkey = key_file,

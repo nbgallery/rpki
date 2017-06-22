@@ -19,7 +19,7 @@ set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
   write_pem(x = p12$key, path = key_file, password = pass)
 
   # set httr config arguments globally so PKI authentication persists
-  # for the whole R session.
+  # for the entire R session.
   # Args:
   #   cainfo: certificate authority (CA) file (.crt)
   #   sslcert: certificate file (.pem)

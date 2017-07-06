@@ -1,6 +1,12 @@
 #' @import openssl
 #' @importFrom getPass getPass
 set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
+  # reuse pki passphrase if user has previously entered it
+  opt <- getOption('pki_passphrase')
+  if (!is.null(opt)) {
+    pass <- opt
+  }
+
   p12 <- tryCatch(
     if (is.null(pass)) {
       read_p12(file = pki_file, pass <- getPass('Enter PKI Password: '))
@@ -11,6 +17,9 @@ set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
       stop('Incorrect password or unrecognized PKI file format.')
     }
   )
+
+  # store pki passphrase to use during session
+  options('pki_passphrase' = pass)
 
   # keep cert and private key in temp files for continued use during the session
   cert_file <- tempfile()

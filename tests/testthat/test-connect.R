@@ -6,7 +6,7 @@ ca.file <- 'root-ca.crt'
 
 test_that('Can still connect to unsecured websites', {
   mypki <- tempfile()
-  configure_httr_pki(mypki_file = mypki,
+  pki_enable_httr(mypki_file = mypki,
                      pki_file = p12.file,
                      ca_file = ca.file,
                      password = p12.password,

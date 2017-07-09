@@ -2,7 +2,7 @@
 #'
 #' Override configuration settings used by the 'httr' package to allow working with PKI-enabled web services.
 #'
-#' Default mypki configuration settings will be used. The PKI certificate file must be in PKCS#12 format. The following 'httr' config settings get modified: cainfo, sslcert, sslkey.
+#' All arguments are optional. Default mypki configuration settings will be used unless otherwise specified. The PKI certificate file must be in PKCS#12 format. The following \code{httr::config} settings are modified: cainfo, sslcert, sslkey.
 #'
 #' If a mypki configuration file cannot be found, users are prompted for file paths to both a PKI certificate and a Certificate Authority (CA) bundle.
 #' @param mypki_file string: absolute file path to save mypki configuration file. Defaults to the home directory
@@ -14,14 +14,14 @@
 #' @export
 #' @examples
 #' library(rpki)
-#' configure_httr_pki() # will prompt for passphrase
+#' pki_enable_httr() # will prompt for passphrase
 #' GET("http://httpbin.org/")
 #'
 #' library(rpki)
-#' configure_httr_pki(password = "my_pki_passphrase")
+#' pki_eable_httr(password = "my_pki_passphrase")
 #' GET("http://httpbin.org/")
 #'
-configure_httr_pki <- function(mypki_file = NULL,
+pki_enable_httr <- function(mypki_file = NULL,
                                pki_file = NULL,
                                ca_file = NULL,
                                password = NULL,
@@ -47,20 +47,46 @@ configure_httr_pki <- function(mypki_file = NULL,
 }
 
 
-.onDetach <- function(libpath) { package_cleanup() }
-.onUnload <- function(libpath) { package_cleanup() }
-environment_cleanup <- function(e) { package_cleanup() }
-
-package_cleanup <- function() {
-  if (!is.null(getOption('httr_config'))) {
-    if (length(getOption('httr_config')$options) > 0) {
-      result <- tryCatch({
-        f <- c(getOption('httr_config')$options$sslcert,
-               getOption('httr_config')$options$sslkey);
-        file.remove(f);
-      })
-    }
+#' @import openssl
+#' @importFrom getPass getPass
+set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
+  # reuse pki passphrase if user has previously entered it
+  opt <- getOption('pki_passphrase')
+  if (!is.null(opt)) {
+    pass <- opt
   }
-  if (isNamespaceLoaded('httr'))
-    httr::reset_config()
+
+  p12 <- tryCatch(
+    if (is.null(pass)) {
+      read_p12(file = pki_file, pass <- getPass('Enter PKI Password: '))
+    } else {
+      read_p12(file = pki_file, pass)
+    },
+    error = function(e) {
+      stop('Incorrect password or unrecognized PKI file format.')
+    }
+  )
+
+  # store pki passphrase to use during session
+  options('pki_passphrase' = pass)
+
+  # keep cert and private key in temp files for continued use during the session
+  cert_file <- tempfile()
+  write_pem(x = p12$cert, path = cert_file)
+  key_file <- tempfile()
+  write_pem(x = p12$key, path = key_file, password = pass)
+
+  # set httr config arguments globally so PKI authentication persists
+  # for the entire R session.
+  # Args:
+  #   cainfo: certificate authority (CA) file (.crt)
+  #   sslcert: certificate file (.pem)
+  #   sslkey: keyfile (.key but PEM formatted)
+  #   keypasswd: pki passphrase
+  httr::set_config(httr::config(cainfo = ca_file,
+                                sslcert = cert_file,
+                                sslkey = key_file,
+                                keypasswd = pass))
 }
+
+

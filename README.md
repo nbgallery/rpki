@@ -1,6 +1,9 @@
 # rpki
 rpki is a wrapper package that PKI-enables the [httr](https://github.com/r-lib/httr) package and the built-in `download.file()` method. Conceptually, rpki is similar to the Python [pypki2](https://github.com/nbgallery/pypki2) and [ipydeps](https://github.com/nbgallery/ipydeps) packages, and is intended to use the same mypki configuration file.
 
+## Requirements
+* [curl](https://curl.haxx.se) - should be installed and executable from the command line (i.e. on the PATH)
+
 ## Details
 rpki can run in interactive or non-interactive R sessions (depending on how the pki passphrase is provided). By default, rpki expects a .mypki configuration file to be located in a user's home directory at `~/.mypki`. If the configuration file is invalid or corrupt, the user will be prompted for file paths to a certificate authority bundle and a PKI file.
 

@@ -72,11 +72,26 @@ set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
 
   # keep cert and private key in temp files for continued use during the session
   cert_file <- tempfile()
-  write_pem(x = p12$cert, path = cert_file)
+  system2('openssl', args = c('pkcs12',
+                              '-in', pki_file,
+                              '-out', cert_file,
+                              '-clcerts', '-nokeys', '-nomacver',
+                              '-passin', paste0('pass:', pass)),
+          stdout = NULL,
+          stderr = NULL)
+
   key_file <- tempfile()
-  write_pem(x = p12$key, path = key_file, password = pass)
-  rsa_key_file <- tempfile()
+  system2('openssl', args = c('pkcs12',
+                              '-in', pki_file,
+                              '-out', key_file,
+                              '-nocerts', '-nomacver',
+                              '-passin', paste0('pass:', pass),
+                              '-passout', paste0('pass:', pass)),
+          stdout = NULL,
+          stderr = NULL)
+
   # write out encrypted RSA key file in PKCS#1 format
+  rsa_key_file <- tempfile()
   system2('openssl', args = c('rsa',
                               '-in', key_file,
                               '-out', rsa_key_file,

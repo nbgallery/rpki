@@ -75,6 +75,16 @@ set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
   write_pem(x = p12$cert, path = cert_file)
   key_file <- tempfile()
   write_pem(x = p12$key, path = key_file, password = pass)
+  rsa_key_file <- tempfile()
+  # write out encrypted RSA key file in PKCS#1 format
+  system2('openssl', args = c('rsa',
+                              '-in', key_file,
+                              '-out', rsa_key_file,
+                              '-des',
+                              '-passin', paste0('pass:', pass),
+                              '-passout', paste0('pass:', pass)),
+          stdout = NULL,
+          stderr = NULL)
 
   # set httr config arguments globally so PKI authentication persists
   # for the entire R session.
@@ -85,7 +95,7 @@ set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
   #   keypasswd: pki passphrase
   httr::set_config(httr::config(cainfo = ca_file,
                                 sslcert = cert_file,
-                                sslkey = key_file,
+                                sslkey = rsa_key_file,
                                 keypasswd = pass))
 }
 

@@ -11,7 +11,7 @@ test_that('Verify whether or not a mypki file is valid', {
 
 test_that('Using a pre-existing mypki file to set httr_options', {
   mypki <- 'sample_valid_mypki.txt'
-  configure_httr_pki(mypki_file = mypki, password = p12.password)
+  pki_enable_httr(mypki_file = mypki, password = p12.password)
 
   expect_false(is.null(getOption('httr_config')))
   reset_config()
@@ -19,7 +19,7 @@ test_that('Using a pre-existing mypki file to set httr_options', {
 
 test_that('Force the creation of a new mypki file', {
   mypki <- tempfile()
-  configure_httr_pki(mypki_file = mypki,
+  pki_enable_httr(mypki_file = mypki,
                      pki_file = p12.file,
                      ca_file = ca.file,
                      password = p12.password,
@@ -30,7 +30,7 @@ test_that('Force the creation of a new mypki file', {
 
 test_that('A mypki file is generated with the correct json format', {
   mypki <- tempfile()
-  configure_httr_pki(mypki_file = mypki,
+  pki_enable_httr(mypki_file = mypki,
                      pki_file = p12.file,
                      ca_file = ca.file,
                      password = p12.password,

@@ -113,3 +113,52 @@ is_valid_mypki <- function(file, password = NULL) {
   }
   TRUE
 }
+
+get_pki_cert <- function(pki) {
+  cert <- getOption('rpki_cert')
+  if (is.null(cert)) {
+    pass <- getOption('rpki_passphrase')
+
+    cert <- tempfile()
+    system2('openssl', args = c('pkcs12',
+                              '-in', pki,
+                              '-out', cert,
+                              '-clcerts', '-nokeys', '-nomacver',
+                              '-passin', paste0('pass:', pass)),
+          stdout = NULL,
+          stderr = NULL)
+    options('rpki_cert' = cert)
+  }
+  return(cert)
+}
+
+get_pki_key <- function(pki) {
+  rsa_key <- getOption('rpki_key')
+  if (is.null(rsa_key)) {
+    pass <- getOption('rpki_passphrase')
+
+    # convert pki to pem format (encrypted)
+    tmp_key <- tempfile()
+    system2('openssl', args = c('pkcs12',
+                                '-in', pki,
+                                '-out', tmp_key,
+                                '-nocerts', '-nomacver',
+                                '-passin', paste0('pass:', pass),
+                                '-passout', paste0('pass:', pass)),
+            stdout = NULL,
+            stderr = NULL)
+
+    # create encrypted RSA key file in PKCS#1 format
+    rsa_key <- tempfile()
+    system2('openssl', args = c('rsa',
+                                '-in', tmp_key,
+                                '-out', rsa_key,
+                                '-des',
+                                '-passin', paste0('pass:', pass),
+                                '-passout', paste0('pass:', pass)),
+            stdout = NULL,
+            stderr = NULL)
+    options('rpki_key' = rsa_key)
+  }
+  return(rsa_key)
+}

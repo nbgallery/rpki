@@ -51,7 +51,7 @@ pki_enable_download_file <- function(mypki_file = NULL,
 #' @importFrom getPass getPass
 set_download_file_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
   # reuse pki passphrase if user has previously entered it
-  opt <- getOption('pki_passphrase')
+  opt <- getOption('rpki_passphrase')
   if (!is.null(opt)) {
     pass <- opt
   }
@@ -68,38 +68,13 @@ set_download_file_config <- function(ca_file = NULL, pki_file = NULL, pass = NUL
   )
 
   # set pki passphrase to use during session
-  options('pki_passphrase' = pass)
+  options('rpki_passphrase' = pass)
 
   # keep cert and private key in temp files for continued use during the session
-  cert_file <- tempfile()
-  system2('openssl', args = c('pkcs12',
-                              '-in', pki_file,
-                              '-out', cert_file,
-                              '-clcerts', '-nokeys', '-nomacver',
-                              '-passin', paste0('pass:', pass)),
-          stdout = NULL,
-          stderr = NULL)
-
-  key_file <- tempfile()
-  system2('openssl', args = c('pkcs12',
-                              '-in', pki_file,
-                              '-out', key_file,
-                              '-nocerts', '-nomacver',
-                              '-passin', paste0('pass:', pass),
-                              '-passout', paste0('pass:', pass)),
-          stdout = NULL,
-          stderr = NULL)
+  cert_file <- get_pki_cert(pki_file)
 
   # write out encrypted RSA key file in PKCS#1 format
-  rsa_key_file <- tempfile()
-  system2('openssl', args = c('rsa',
-                              '-in', key_file,
-                              '-out', rsa_key_file,
-                              '-des',
-                              '-passin', paste0('pass:', pass),
-                              '-passout', paste0('pass:', pass)),
-          stdout = NULL,
-          stderr = NULL)
+  rsa_key_file <- get_pki_key(pki_file)
 
   # set download.file options globally so they persist for the entire R session.
   # Args:

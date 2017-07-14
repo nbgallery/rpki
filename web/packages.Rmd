@@ -1,0 +1,25 @@
+---
+title: "packages"
+---
+This will eventually be some kind of list of packages.
+
+```{r page_options, include=FALSE}
+# https://yihui.name/knitr/options
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+```{r create_package_pages, include=FALSE}
+source('generate_pages.R')
+```
+
+```{r generate_package_table}
+# How to set hyperlinks for each package:
+#   https://stackoverflow.com/questions/35078430/including-links-within-rmarkdown-tables-pdf
+
+library(knitr)
+pkgs <- as.data.frame(pkgAvail(repos='/path/to/repo'))
+urls <- paste0(pkgs$Package, '_report', '.html')
+pkgs$Package <- paste0("[", pkgs$Package, "](", urls, ")")
+kable(pkgs[,c("Package","Version")], format = 'markdown', row.names = FALSE)
+```

@@ -1,0 +1,7 @@
+Welcomes to my private CRAN REPO!
+
+```{r page_options, include=FALSE}
+# https://yihui.name/knitr/options
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(include = FALSE) ## do not publish output from any chunks
+```

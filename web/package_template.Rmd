@@ -1,0 +1,24 @@
+```{r options, include=FALSE}
+# https://yihui.name/knitr/options
+knitr::opts_chunk$set(echo = FALSE)
+```
+```{r package_info, results='asis'}
+library(knitr)
+library(stringr)
+if (exists("package_name")) {
+  pkg_info <- packageDescription(package_name, fields = c('Package','Version','Title','Description','URL','Date/Publication'))
+  # Title
+  cat('**', pkg_info$Package,': ', pkg_info$Title, '** \n', sep='')
+  # Description
+  desc <- gsub("\\s+", " ", str_trim(pkg_info$Description))
+  cat(desc,'\n', sep='')
+  # all other fields
+  pkg_info$Description <- NULL
+  pkg_info$Title <- NULL
+  l <- lapply(pkg_info, function(x) {return(x[[1]])})
+  m <- unlist(l)
+  df <- data.frame(A=m)
+  kable(df, format = 'markdown')
+}
+```
+

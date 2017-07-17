@@ -1,16 +1,8 @@
----
-title: "packages"
----
-This will eventually be some kind of list of packages.
-
 ```{r page_options, include=FALSE}
 # https://yihui.name/knitr/options
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(warning = FALSE)
-```
-
-```{r create_package_pages, include=FALSE}
-source('generate_pages.R')
+knitr::opts_chunk$set(message = FALSE)
 ```
 
 ```{r generate_package_table}
@@ -18,8 +10,16 @@ source('generate_pages.R')
 #   https://stackoverflow.com/questions/35078430/including-links-within-rmarkdown-tables-pdf
 
 library(knitr)
-pkgs <- as.data.frame(pkgAvail(repos='/path/to/repo'))
-urls <- paste0(pkgs$Package, '_report', '.html')
-pkgs$Package <- paste0("[", pkgs$Package, "](", urls, ")")
-kable(pkgs[,c("Package","Version")], format = 'markdown', row.names = FALSE)
+library(stringr)
+pkgs <- as.data.frame(available.packages(repos='file:/path/to/drat_repo'), stringsAsFactors = F)
+# alphabetical order
+pkgs <- pkgs[order(pkgs$Package),]
+
+# Parse out the title from each package for a short description of what the package does
+pkgs$Title <- sapply(pkgs$Package, function(pkg) {
+    title <- packageDescription(pkg, fields = c('Title'))
+    title <- gsub("\\s+", " ", str_trim(title))
+})
+
+kable(pkgs[,c("Package","Title","Version")], format = 'markdown', row.names = FALSE)
 ```

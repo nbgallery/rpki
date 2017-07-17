@@ -1,7 +1,22 @@
 Welcomes to my private CRAN REPO!
 
-```{r page_options, include=FALSE}
+```{r echo=FALSE, out.width='75%', fig.align='center'}
 # https://yihui.name/knitr/options
-knitr::opts_chunk$set(echo = FALSE)
-knitr::opts_chunk$set(include = FALSE) ## do not publish output from any chunks
+knitr::include_graphics('./logo1.png')
+```
+
+To install packages from this private repo, add the following to your .Rprofile
+
+```{r eval=F}
+r <- getOption("repos")
+r["PRIVATE-CRAN"] <- "http://cran.us.r-project.org"
+options(repos=r)
+```
+
+Once the repo has been added, you must use the `rpki` package in order to securely install packages.
+
+```{r eval=F}
+library(rpki)
+pki_enable_download_file() # will prompt for pki passphrase
+install.packages('private_r_package')
 ```

@@ -5,7 +5,9 @@ rpki is a wrapper package that PKI-enables the [httr](https://github.com/r-lib/h
 1. Download rpki from the git repository and unzip the folder. Rename the folder to `rpki` if necessary
 2. Open a terminal and go to the directory where the `rpki` folder was downloaded
 3. Run the command:
-> R CMD INSTALL rpki
+```code
+R CMD INSTALL rpki
+```
 
 ### Requirements
 * R (>= 3.3.0)

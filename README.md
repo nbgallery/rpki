@@ -73,7 +73,7 @@ install.packages('my_private_package')
 ```
 
 ## Details
-rpki can run in interactive or non-interactive R sessions (depending on how the pki passphrase is provided). By default, rpki expects a .mypki configuration file to be located in a user's home directory at `~/.mypki`. If the configuration file is invalid or corrupt, the user will be prompted for file paths to a certificate authority bundle and a PKI file.
+By default, rpki expects a .mypki configuration file to be located in a user's home directory at `~/.mypki`. If the configuration file is invalid or corrupt, the user will be prompted for file paths to a certificate authority bundle and a PKI file.
 
 To pki-enable the httr package, the following httr config settings are defined
 * cainfo

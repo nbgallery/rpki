@@ -12,33 +12,42 @@ R CMD INSTALL rpki
 ### Requirements
 * R (>= 3.3.0)
 * [curl](https://curl.haxx.se) - should be installed and executable from the command line (i.e. on the PATH)
+* [openssl](https://www.openssl.org/) - should be installed and exucutable from the command line (i.e. on the PATH)
 
-## Examples - Fetching a URL
-### Interactive
+Most unix-like operating systems already have curl and openssl installed by default.
+
+## Examples
+rpki can run in both interactive or non-interactive R sessions. The only difference is the pki passphrase must be written out in plain text.
+
+### Interactive - Fetching a URL
 ```r
 library(rpki)
 pki_enable_httr() # will prompt for pki passphrase if necessary
 GET('https://your.pki.enabled.website/path/to/whatever')
 ```
-```r
-library(rpki)
-pki_enable_download_file() # will prompt for passphrase
-install.packages('my_private_package')
-```
-### Non-interactive
+### Non-interactive - Fetching a URL
 rpki can run in non-interactive sessions when the pki passphrase is explicitly provided.
 ```r
 library(rpki)
 pki_enable_httr(password = 'my_pki_passphrase') # will not prompt for pki passphrase
 GET('https://your.pki.enabled.website/path/to/whatever')
 ```
+
+### Interactive - Installing a package
+```r
+library(rpki)
+pki_enable_download_file() # will prompt for passphrase
+install.packages('my_private_package')
+```
+### Non-interactive - Installing a package
 ```r
 library(rpki)
 pki_enable_download_file(password = 'my_pki_passphrase')
 install.packages('my_private_package')
 ```
-### Manual Configuration
-Configuration options can be explicitly defined in order to overwrite previous settings.
+
+## Manual Configuration
+Configuration options can be explicitly defined in order to overwrite default settings (interactive or non-interactive mode).
 ### Interactive Sessions
 ```r
 library(rpki)

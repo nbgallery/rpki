@@ -1,7 +1,14 @@
 # rpki
 rpki is a wrapper package that PKI-enables the [httr](https://github.com/r-lib/httr) package and the built-in `download.file()` method. Conceptually, rpki is similar to the Python [pypki2](https://github.com/nbgallery/pypki2) and [ipydeps](https://github.com/nbgallery/ipydeps) packages, and is intended to use the same mypki configuration file.
 
-## Requirements
+## Installation
+1. Download rpki from the git repository and unzip the folder. Rename the folder to `rpki` if necessary
+2. Open a terminal and go to the directory where the `rpki` folder was downloaded
+3. Run the command:
+> R CMD INSTALL rpki
+
+### Requirements
+* R (>= 3.3.0)
 * [curl](https://curl.haxx.se) - should be installed and executable from the command line (i.e. on the PATH)
 
 ## Details

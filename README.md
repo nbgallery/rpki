@@ -17,7 +17,7 @@ R CMD INSTALL rpki
 Most unix-like operating systems already have curl and openssl installed by default.
 
 ## Examples
-rpki can run in both interactive or non-interactive R sessions. The only difference is the pki passphrase must be written out in plain text.
+rpki can run in both interactive or non-interactive R sessions. The only difference is the pki passphrase must be passed to rpki in plain text during non-interactive sessions.
 
 ### Interactive - Fetching a URL
 ```r
@@ -90,7 +90,7 @@ To pki-enable the `download.file()` method, the download method is set to "curl"
 rpki will only prompt the user for a pki passphrase once per R session.
 
 ### .mypki Configuration File
-A proper .mypki configuration file should be json formatted and at minimum specify the absolute file paths to a Certificate Authority (CA) bundle and a PKCS12 digital certificate.
+A proper .mypki configuration file should be json formatted and at minimum specify the absolute file paths to a Certificate Authority (CA) bundle and a PKCS #12 digital certificate.
 ```json
 {
   "ca": "/path/to/certificate_authority_bundle.crt",

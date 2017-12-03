@@ -24,4 +24,3 @@ Imports:
     stringr (>= 1.2.0)
 Suggests: testthat (>= 1.0.2)
 URL: https://github.com/nbgallery/rpki, https://github.com/nbgallery
-Suggests: testthat

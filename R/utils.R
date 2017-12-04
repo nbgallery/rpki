@@ -99,7 +99,7 @@ is_valid_mypki <- function(file, password = NULL) {
   # check file format and verify pki passphrase of pki certificate
   if (!is.null(password)) {
     bad_password = TRUE
-    if ((typeof(password) == 'character') & (length(password) ==1)) {
+    if ((typeof(password) == 'character') & (length(password) != 0)) {
       tryCatch({
         openssl::read_p12(file = json_data$p12$path, password = password)
         bad_password = FALSE
@@ -114,51 +114,51 @@ is_valid_mypki <- function(file, password = NULL) {
   TRUE
 }
 
-get_pki_cert <- function(pki) {
+# input: file path to a pkcs#12 file
+get_pki_cert <- function(pki_file, password) {
   cert <- getOption('rpki_cert')
-  if (is.null(cert)) {
-    pass <- getOption('rpki_passphrase')
+  if(!is.null(cert))
+    return(cert)
 
-    cert <- tempfile()
-    system2('openssl', args = c('pkcs12',
-                              '-in', pki,
-                              '-out', cert,
-                              '-clcerts', '-nokeys', '-nomacver',
-                              '-passin', paste0('pass:', pass)),
-          stdout = NULL,
-          stderr = NULL)
-    options('rpki_cert' = cert)
-  }
+  p12 <- tryCatch(
+    read_p12(file = pki_file, password),
+    error = function(e) {
+      stop('Incorrect password or unrecognized PKI file format.')
+    }
+  )
+
+  # write certificate to temp file
+  cert <- tempfile()
+  openssl::write_pem(x=p12$cert, path=cert)
+  options('rpki_cert' = cert)
   return(cert)
 }
 
-get_pki_key <- function(pki) {
-  rsa_key <- getOption('rpki_key')
-  if (is.null(rsa_key)) {
-    pass <- getOption('rpki_passphrase')
+get_pki_key <- function(pki_file, password) {
+  key <- getOption('rpki_key')
+  if(!is.null(key))
+    return(key)
 
-    # convert pki to pem format (encrypted)
-    tmp_key <- tempfile()
-    system2('openssl', args = c('pkcs12',
-                                '-in', pki,
-                                '-out', tmp_key,
-                                '-nocerts', '-nomacver',
-                                '-passin', paste0('pass:', pass),
-                                '-passout', paste0('pass:', pass)),
-            stdout = NULL,
-            stderr = NULL)
+  p12 <- tryCatch(
+    read_p12(file = pki_file, password),
+    error = function(e) {
+      stop('Incorrect password or unrecognized PKI file format.')
+    }
+  )
 
-    # create encrypted RSA key file in PKCS#1 format
-    rsa_key <- tempfile()
-    system2('openssl', args = c('rsa',
-                                '-in', tmp_key,
-                                '-out', rsa_key,
-                                '-des',
-                                '-passin', paste0('pass:', pass),
-                                '-passout', paste0('pass:', pass)),
-            stdout = NULL,
-            stderr = NULL)
-    options('rpki_key' = rsa_key)
+  # write certificate to temp file
+  key <- tempfile()
+  openssl::write_pem(x=p12$key, path=key, password = password)
+  options('rpki_key' = key)
+  return(key)
+}
+
+# Ask for pki password and store it for reuse during the current session
+get_pki_password <- function() {
+  p <- getOption('rpki_password')
+  if(is.null(p)) {
+    p <- getPass('Enter PKI Password: ')
+    options('rpki_password' = p)
   }
-  return(rsa_key)
+  return(p)
 }

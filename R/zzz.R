@@ -1,3 +1,4 @@
+# backup R environment settings before package is used
 .onLoad <- function(...) {
   options('rpki_backup_download.file.method' = getOption('download.file.method'))
   options('rpki_backup_download.file.extra' = getOption('download.file.extra'))
@@ -20,13 +21,14 @@ package_cleanup <- function() {
       })
     }
   }
-  # clean up httr options
+  # clean up the httr options that were set
   if (isNamespaceLoaded('httr')) httr::reset_config()
   options('httr_config' = NULL)
 
-  # clean up options for download.file
+  # restore download.file settings to original values
   options('download.file.method' = getOption('rpki_backup_download.file.method'))
   options('download.file.extra' = getOption('rpki_backup_download.file.extra'))
-  # remove pki passphrase from memory
-  options('pki_passphrase' = NULL)
+
+  # remove pki password from memory
+  options('rpki_password' = NULL)
 }

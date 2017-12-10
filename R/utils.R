@@ -119,6 +119,9 @@ get_pki_cert <- function(pki) {
   if (is.null(cert)) {
     pass <- getOption('rpki_passphrase')
 
+    # wrap file name in quotes in case it contains space characters
+    pki <- paste0("\'", pki, "\'")
+
     cert <- tempfile()
     system2('openssl', args = c('pkcs12',
                               '-in', pki,
@@ -136,6 +139,9 @@ get_pki_key <- function(pki) {
   rsa_key <- getOption('rpki_key')
   if (is.null(rsa_key)) {
     pass <- getOption('rpki_passphrase')
+
+    # wrap file name in quotes in case it contains space characters
+    pki <- paste0("\'", pki, "\'")
 
     # convert pki to pem format (encrypted)
     tmp_key <- tempfile()

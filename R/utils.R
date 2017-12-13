@@ -118,7 +118,8 @@ get_pki_cert <- function(pki) {
   cert <- getOption('rpki_cert')
   if (is.null(cert)) {
     pass <- getOption('rpki_passphrase')
-
+    pass <- shQuote(pass)
+    
     # wrap file name in quotes in case it contains space characters
     pki <- paste0("\'", pki, "\'")
 
@@ -139,7 +140,8 @@ get_pki_key <- function(pki) {
   rsa_key <- getOption('rpki_key')
   if (is.null(rsa_key)) {
     pass <- getOption('rpki_passphrase')
-
+    pass <- shQuote(pass)
+    
     # wrap file name in quotes in case it contains space characters
     pki <- paste0("\'", pki, "\'")
 

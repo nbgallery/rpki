@@ -96,10 +96,10 @@ is_valid_mypki <- function(file, password = NULL) {
     return(FALSE)
   }
 
-  # check file format and verify pki passphrase of pki certificate
+  # check file format and verify pki password
   if (!is.null(password)) {
     bad_password = TRUE
-    if ((typeof(password) == 'character') & (length(password) ==1)) {
+    if ((typeof(password) == 'character') & (nchar(password) > 0)) {
       tryCatch({
         openssl::read_p12(file = json_data$p12$path, password = password)
         bad_password = FALSE
@@ -114,59 +114,70 @@ is_valid_mypki <- function(file, password = NULL) {
   TRUE
 }
 
-get_pki_cert <- function(pki) {
-  cert <- getOption('rpki_cert')
-  if (is.null(cert)) {
-    pass <- getOption('rpki_passphrase')
-    pass <- shQuote(pass)
-    
-    # wrap file name in quotes in case it contains space characters
-    pki <- paste0("\'", pki, "\'")
+# input: file path to a pkcs#12 file
+get_pki_cert <- function(pki_file, password) {
+  cert_file <- getOption('rpki_cert')
+  if(!is.null(cert_file))
+    return(cert_file)
 
-    cert <- tempfile()
-    system2('openssl', args = c('pkcs12',
-                              '-in', pki,
-                              '-out', cert,
+  # wrap password and pki filename in quotes in case white space or special characters exist
+  password <- shQuote(password)
+  pki_file <- shQuote(pki_file)
+
+  cert_file <- tempfile()
+  system2('openssl', args = c('pkcs12',
+                              '-in', pki_file,
+                              '-out', cert_file,
                               '-clcerts', '-nokeys', '-nomacver',
-                              '-passin', paste0('pass:', pass)),
+                              '-passin', paste0('pass:', password)),
           stdout = NULL,
           stderr = NULL)
-    options('rpki_cert' = cert)
-  }
-  return(cert)
+  # write certificate to temp file
+  options('rpki_cert' = cert_file)
+  return(cert_file)
 }
 
-get_pki_key <- function(pki) {
-  rsa_key <- getOption('rpki_key')
-  if (is.null(rsa_key)) {
-    pass <- getOption('rpki_passphrase')
-    pass <- shQuote(pass)
-    
-    # wrap file name in quotes in case it contains space characters
-    pki <- paste0("\'", pki, "\'")
+get_pki_key <- function(pki_file, password) {
+  key_file <- getOption('rpki_key')
+  if(!is.null(key_file))
+    return(key_file)
 
-    # convert pki to pem format (encrypted)
-    tmp_key <- tempfile()
-    system2('openssl', args = c('pkcs12',
-                                '-in', pki,
-                                '-out', tmp_key,
-                                '-nocerts', '-nomacver',
-                                '-passin', paste0('pass:', pass),
-                                '-passout', paste0('pass:', pass)),
-            stdout = NULL,
-            stderr = NULL)
+  # wrap password and pki filename in quotes in case white space or special characters exist
+  password <- shQuote(password)
+  pki_file <- shQuote(pki_file)
 
-    # create encrypted RSA key file in PKCS#1 format
-    rsa_key <- tempfile()
-    system2('openssl', args = c('rsa',
-                                '-in', tmp_key,
-                                '-out', rsa_key,
-                                '-des',
-                                '-passin', paste0('pass:', pass),
-                                '-passout', paste0('pass:', pass)),
-            stdout = NULL,
-            stderr = NULL)
-    options('rpki_key' = rsa_key)
+  # write certificate to temp file
+  # convert pki to pem format (encrypted)
+  tmp <- tempfile()
+  system2('openssl', args = c('pkcs12',
+                              '-in', pki_file,
+                              '-out', tmp,
+                              '-nocerts', '-nomacver',
+                              '-passin', paste0('pass:', password),
+                              '-passout', paste0('pass:', password)),
+          stdout = NULL,
+          stderr = NULL)
+
+  # create encrypted RSA key file in PKCS#1 format
+  key_file <- tempfile()
+  system2('openssl', args = c('rsa',
+                              '-in', tmp,
+                              '-out', key_file,
+                              '-des',
+                              '-passin', paste0('pass:', password),
+                              '-passout', paste0('pass:', password)),
+          stdout = NULL,
+          stderr = NULL)
+  options('rpki_key' = key_file)
+  return(key_file)
+}
+
+# Ask for pki password and store it for reuse during the current session
+get_pki_password <- function() {
+  p <- getOption('rpki_password')
+  if(is.null(p)) {
+    p <- getPass('Enter PKI Password: ')
+    options('rpki_password' = p)
   }
-  return(rsa_key)
+  return(p)
 }

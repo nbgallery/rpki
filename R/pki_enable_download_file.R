@@ -50,31 +50,14 @@ pki_enable_download_file <- function(mypki_file = NULL,
 #' @import openssl
 #' @importFrom getPass getPass
 set_download_file_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
-  # reuse pki passphrase if user has previously entered it
-  opt <- getOption('rpki_passphrase')
-  if (!is.null(opt)) {
-    pass <- opt
-  }
+  # get pki password, reuse the stored pki password if user has previously entered it
+  if (!is.null(pass))
+    options('rpki_password' = pass)
+  pass <- get_pki_password()
 
-  p12 <- tryCatch(
-    if (is.null(pass)) {
-      read_p12(file = pki_file, pass <- getPass('Enter PKI Password: '))
-    } else {
-      read_p12(file = pki_file, pass)
-    },
-    error = function(e) {
-      stop('Incorrect password or unrecognized PKI file format.')
-    }
-  )
-
-  # set pki passphrase to use during session
-  options('rpki_passphrase' = pass)
-
-  # keep cert and private key in temp files for continued use during the session
-  cert_file <- get_pki_cert(pki_file)
-
-  # write out encrypted RSA key file in PKCS#1 format
-  rsa_key_file <- get_pki_key(pki_file)
+  # keep cert and private key in encrypted temp files for continued use during the session
+  cert_file <- get_pki_cert(pki_file, pass)
+  rsa_key_file <- get_pki_key(pki_file, pass)
 
   # set download.file options globally so they persist for the entire R session.
   # Args:

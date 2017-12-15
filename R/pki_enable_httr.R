@@ -26,7 +26,7 @@ pki_enable_httr <- function(mypki_file = NULL,
                                ca_file = NULL,
                                password = NULL,
                                overwrite = FALSE) {
-  mypki_file <- ifelse(is.null(mypki_file), get_mypki_path(), mypki_file) # defaults to home directory
+  mypki_file <- ifelse(is.null(mypki_file), get_config_path(), mypki_file) # defaults to home directory
   if (overwrite) {
     if (any(is.null(pki_file), is.null(ca_file))) {
       create_mypki(file = mypki_file)

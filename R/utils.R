@@ -4,25 +4,33 @@ write_mypki <- function(mypki_file, ca_file, pki_file) {
   write(jsonlite::toJSON(l, pretty = TRUE, auto_unbox = TRUE), file = mypki_file)
 }
 
-
-# get default .mypki file path
-# default = user home directory
-get_mypki_path <- function() {
-  home_dir = ''
-  # Windows
-  if (.Platform$OS.type == 'windows') {
-    home_dir = Sys.getenv('USERPROFILE')
-    if (home_dir == '') warning('Could not find USERPROFILE environment variable.')
-  }
-  # Linux/Mac
-  if (.Platform$OS.type == 'unix') {
-    home_dir = Sys.getenv('HOME')
-    if (home_dir == '') warning('Could not find HOME environment variable.')
-  }
-  if (home_dir == '') stop('Could not determine home directory.') # this should never happen
-  path <- paste0(home_dir, .Platform$file.sep, '.mypki')
+mypki_config_path <- function() {
+  d = Sys.getenv('MYPKI_CONFIG')
+  if(dir.exists(d)) {
+    paste0(d, .Platform$file.sep, 'mypki_config')
+  } else return(NULL)
 }
 
+home_config_path <- function() {
+  d = Sys.getenv('HOME')
+  if(dir.exists(d)) {
+    return(paste0(d, .Platform$file.sep, '.mypki'))
+  } else
+    return(NULL)
+}
+
+# get default .mypki file path
+get_config_path <- function() {
+  p <- mypki_config_path()
+  if(!is.null(p))
+    return(p)
+
+  p <- home_config_path()
+  if(!is.null(p))
+    return(p)
+
+  stop('Could not find MYPKI_CONFIG or HOME environment variables.  If you are on Windows, you need to add a MYPKI_CONFIG environment variable in Control Panel.')
+}
 
 # create a new .mypki file at the specified file location
 create_mypki <- function(file) {

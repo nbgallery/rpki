@@ -16,7 +16,7 @@ pki_enable_httr(mypki_file = NULL, pki_file = NULL, ca_file = NULL,
 
 \item{password}{string: passphrase used to encrypt/decrypt the private key of the PKI certificate}
 
-\item{overwrite}{logical: overwrite a pre-existing mypki configuration file, if found. Defaults to FALSE}
+\item{overwrite}{logical: force overwrite a pre-existing mypki configuration file if found. Defaults to FALSE}
 }
 \description{
 Override configuration settings used by the 'httr' package to allow working with PKI-enabled web services.

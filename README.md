@@ -14,10 +14,16 @@ R CMD INSTALL rpki
 * [curl](https://curl.haxx.se) - should be installed and executable from the command line (i.e. on the PATH)
 * [openssl](https://www.openssl.org/) - should be installed and exucutable from the command line (i.e. on the PATH)
 
-Most unix-like operating systems already have curl and openssl installed by default.
+## Quickstart
+At minimum, you must provide a pkcs#12 file (and password) and Certificate Authority bundle
+```r
+library(rpki)
+pki_enable_httr(pki_file = '/path/to/my/pki_file.p12', ca_file = 'path/to/my/ca_bundle.crt', password = 'my_pki_password') # will prompt for pki passphrase if necessary
+GET('https://your.pki.enabled.website/path/to/whatever')
+```
 
 ## Examples
-rpki can run in both interactive or non-interactive R sessions. The only difference is the pki passphrase must be passed to rpki in plain text during non-interactive sessions.
+rpki can run in both interactive or non-interactive R sessions. The major difference is the pki passphrase must be passed in plain text for non-interactive sessions (see examples below).
 
 ### Interactive - Fetching a URL
 ```r

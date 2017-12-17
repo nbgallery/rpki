@@ -1,3 +1,13 @@
+# check for external software dependencies
+dependency_check <- function() {
+  prog <- Sys.which('openssl')
+  if(!file.exists(prog))
+    stop('ERROR: Unable to locate openssl executable. Openssl is not installed or not on the search path.')
+  prog <- Sys.which('curl')
+  if(!file.exists(prog))
+    stop('ERROR: Unable to locate curl executable. Curl is not installed or not on the search path.')
+}
+
 # write a json-formatted .mypki file
 write_mypki <- function(mypki_file, ca_file, pki_file) {
   l <- list(ca = ca_file, p12 = list(path = pki_file))
@@ -29,17 +39,17 @@ get_config_path <- function() {
   if(!is.null(p))
     return(p)
 
-  stop('Could not find MYPKI_CONFIG or HOME environment variables.  If you are on Windows, you need to add a MYPKI_CONFIG environment variable in Control Panel.')
+  warning('Could not find MYPKI_CONFIG or HOME environment variables. If you are on Windows, you need to add a MYPKI_CONFIG environment variable in the Control Panel.')
 }
 
-# create a new .mypki file at the specified file location
+# create a new .mypki file in JSON format at the specified file location
 create_mypki <- function(file) {
   max_tries <- 10 # prevent an infinite loop situation
   try <- 0
   repeat{
-    ca_file <- readline(prompt = 'Enter full path to Certificate Authority bundle (.crt): ')
+    ca_file <- readline(prompt = 'Enter full file path to Certificate Authority bundle (.crt): ')
     ca_file <- stringr::str_trim(ca_file)
-    pki_file <- readline(prompt = 'Enter full path to PKI certificate file: ')
+    pki_file <- readline(prompt = 'Enter full file path to PKI certificate file: ')
     pki_file <- stringr::str_trim(pki_file)
 
     write_mypki(mypki_file = file, ca_file = ca_file, pki_file = pki_file)
@@ -69,7 +79,7 @@ is_valid_mypki <- function(file, password = NULL) {
   json_data <- tryCatch(
     jsonlite::fromJSON(txt = file),
     error = function(e) {
-      message(paste0('Malformed ', file, ' file.'))
+      message(paste0('Unable to parse mypki file at ', file, '. Is it in json format?'))
       return(FALSE)
     }
   )
@@ -82,7 +92,7 @@ is_valid_mypki <- function(file, password = NULL) {
 
   # check file path of Certificate Authority bundle
   if (!(file.exists(json_data$ca))) {
-    message('Certifate Authority (CA) file not found.')
+    message(paste0('Cannot find Certifate Authority (CA) file. Expected at ', json_data$ca))
     return(FALSE)
   }
 
@@ -100,7 +110,7 @@ is_valid_mypki <- function(file, password = NULL) {
 
   # check file path of pki certificate
   if (!file.exists(json_data$p12$path)) {
-    message('PKI file not found.')
+    message(paste0('PKI file not found. Expected at ',json_data$p12$path))
     return(FALSE)
   }
 

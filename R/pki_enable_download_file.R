@@ -11,7 +11,7 @@
 #' @param pki_file string: absolute file path to a pki certificate
 #' @param ca_file string: absolute file path to a Certificate Authority (CA) bundle
 #' @param password string: passphrase used to encrypt/decrypt the PKI certificate
-#' @param overwrite logical: overwrite a pre-existing mypki configuration file, if found. Defaults to FALSE
+#' @param overwrite logical: force overwrite a pre-existing mypki configuration file if found. Defaults to FALSE
 #' @import httr
 #' @export
 #' @examples
@@ -29,6 +29,9 @@ pki_enable_download_file <- function(mypki_file = NULL,
                                ca_file = NULL,
                                password = NULL,
                                overwrite = FALSE) {
+
+  dependency_check()
+
   mypki_file <- ifelse(is.null(mypki_file), get_config_path(), mypki_file) # defaults to home directory
   if (overwrite) {
     if (any(is.null(pki_file), is.null(ca_file))) {
@@ -39,7 +42,7 @@ pki_enable_download_file <- function(mypki_file = NULL,
   # read from pre-existing mypki file
   valid <- is_valid_mypki(file = mypki_file, password = password)
   if (!valid)
-    stop(paste0('Invalid mypki configuration at ', mypki_file, '. Set overwrite = TRUE'))
+    stop(paste0('Invalid mypki configuration file at ', mypki_file))
   json_data <- jsonlite::fromJSON(txt = mypki_file)
 
   # make download.file configuration changes

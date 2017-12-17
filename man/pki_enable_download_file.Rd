@@ -16,7 +16,7 @@ pki_enable_download_file(mypki_file = NULL, pki_file = NULL,
 
 \item{password}{string: passphrase used to encrypt/decrypt the PKI certificate}
 
-\item{overwrite}{logical: overwrite a pre-existing mypki configuration file, if found. Defaults to FALSE}
+\item{overwrite}{logical: force overwrite a pre-existing mypki configuration file if found. Defaults to FALSE}
 }
 \description{
 Override default configuration settings used by \code{download.file()} to allow for PKI-enabled use of \code{install.packages()}.

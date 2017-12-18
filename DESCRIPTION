@@ -8,9 +8,6 @@ Authors@R: c(
 Description: A collection of wrapper functions that configure the 'httr' package and other base R functions for
     PKI-authenticated services. Conceptually similar to the Python 'pypki2' and `ipydeps`
     packages, this package uses the same mypki configuration file.
-    It is part of the nbgallery 'Jupyter' software suite. Configuration
-    functions make it easy to use in other environments
-    besides 'Jupyter'.
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 6.0.1

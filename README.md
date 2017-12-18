@@ -23,7 +23,7 @@ GET('https://your.pki.enabled.website/path/to/whatever')
 ```
 
 ## Examples
-rpki can run in both interactive or non-interactive R sessions. The major difference is the pki passphrase must be passed in plain text for non-interactive sessions (see examples below).
+rpki can run in interactive or non-interactive R sessions. The major difference is the pki passphrase must be passed in plain text for non-interactive sessions (see examples below). All examples below assume a mypki configuration file has been created (see section on .mypki configuration file).
 
 ### Interactive - Fetching a URL
 ```r
@@ -79,9 +79,9 @@ install.packages('my_private_package')
 ```
 
 ## Details
-By default rpki expects a .mypki configuration file to be located in a user's home directory at `~/.mypki`. If the configuration file is invalid or corrupt, the user will be prompted for file paths to a certificate authority bundle and a PKI file.
+By default rpki expects a .mypki configuration file to be located in the user's home directory at `~/.mypki`. If the configuration file is invalid or corrupt, the user will be prompted for file paths to a certificate authority bundle and a PKI file.
 
-To pki-enable the httr package, the following httr config settings are defined
+To pki-enable the httr package, rpki modifies the following httr config settings
 * cainfo
 * sslcert
 * sslkey
@@ -96,7 +96,7 @@ To pki-enable the `download.file()` method, the download method is set to "curl"
 rpki will only prompt the user for a pki passphrase once per R session.
 
 ### .mypki Configuration File
-A proper .mypki configuration file should be json formatted and at minimum specify the absolute file paths to a Certificate Authority (CA) bundle and a PKCS #12 digital certificate.
+A proper .mypki configuration file should be json formatted and at minimum specify the absolute file paths to a Certificate Authority (CA) bundle and a pkcs#12 digital certificate.
 ```json
 {
   "ca": "/path/to/certificate_authority_bundle.crt",

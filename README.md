@@ -18,7 +18,7 @@ R CMD INSTALL rpki
 At minimum, you must provide a pkcs#12 file (and password) and Certificate Authority bundle
 ```r
 library(rpki)
-pki_enable_httr(pki_file = '/path/to/my/pki_file.p12', ca_file = 'path/to/my/ca_bundle.crt', password = 'my_pki_password')
+pki_enable_httr(pki_file = '/path/to/my/pki_file.p12', ca_file = 'path/to/my/ca_bundle.crt')
 GET('https://your.pki.enabled.website/path/to/whatever')
 ```
 

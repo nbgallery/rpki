@@ -79,7 +79,7 @@ install.packages('my_private_package')
 ```
 
 ## Details
-By default rpki expects a .mypki configuration file to be located in the user's home directory at `~/.mypki`. If the configuration file is invalid or corrupt, the user will be prompted for file paths to a certificate authority bundle and a PKI file.
+By default rpki expects a .mypki configuration file to be located in the user's home directory at `~/.mypki`. If the configuration file is invalid or corrupt, the user will be prompted for file paths to a certificate authority bundle and a PKI file. rpki will only prompt the user for a pki passphrase once per R session.
 
 To pki-enable the httr package, rpki modifies the following httr config settings
 * cainfo
@@ -93,7 +93,7 @@ To pki-enable the `download.file()` method, the download method is set to "curl"
 * key
 * pass
 
-rpki will only prompt the user for a pki passphrase once per R session.
+By modifying `download.file()`, the standard `install.packages()` function can be used to install packages over secure connections (https).
 
 ### .mypki Configuration File
 A proper .mypki configuration file should be json formatted and at minimum specify the absolute file paths to a Certificate Authority (CA) bundle and a pkcs#12 digital certificate.

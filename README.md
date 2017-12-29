@@ -19,7 +19,13 @@ At minimum, you must provide a pkcs#12 file (and password) and Certificate Autho
 ```r
 library(rpki)
 pki_enable_httr(pki_file = '/path/to/my/pki_file.p12', ca_file = 'path/to/my/ca_bundle.crt')
-GET('https://your.pki.enabled.website/path/to/whatever')
+resp <- GET('https://your.pki.enabled.website/path/to/whatever')
+```
+Alternatively, the pki file and CA bundle can be defined in a configuration file (see below) and placed in your home directory at `~/.mypki` for reuse. You only need to provide the pki password once per R session.
+```r
+library(rpki)
+pki_enable_httr()
+resp <- GET('https://your.pki.enabled.website/path/to/whatever')
 ```
 
 ## Examples

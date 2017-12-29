@@ -101,8 +101,8 @@ To pki-enable the `download.file()` method, the download method is set to "curl"
 
 By modifying `download.file()`, the standard `install.packages()` function can be used to install packages over secure connections (https).
 
-### .mypki Configuration File
-A proper .mypki configuration file should be json formatted and at minimum specify the absolute file paths to a Certificate Authority (CA) bundle and a pkcs#12 digital certificate.
+## Configuration File
+A `.mypki` configuration file is in json format and defines the absolute file paths to a Certificate Authority (CA) bundle and a pkcs#12 digital certificate.
 ```json
 {
   "ca": "/path/to/certificate_authority_bundle.crt",

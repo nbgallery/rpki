@@ -1,6 +1,6 @@
 Package: rpki
 Title: Tools to PKI-enable Utilities in R and Allow for Secure Connections and Package Installation
-Version: 1.0.4
+Version: 1.0.5
 Authors@R: c(
     person("Joshua", "Bradley", , "jgbradley1@gmail.com", role = c("aut", "cre")),
     person("nbgallery", role = "cph")

@@ -22,10 +22,11 @@
 #' GET("http://httpbin.org/")
 #'
 pki_enable_httr <- function(mypki_file = NULL,
-                               pki_file = NULL,
-                               ca_file = NULL,
-                               password = NULL,
-                               overwrite = FALSE) {
+                            pki_file = NULL,
+                            ca_file = NULL,
+                            password = NULL,
+                            overwrite = FALSE) {
+
   mypki_file <- ifelse(is.null(mypki_file), get_mypki_path(), mypki_file) # defaults to home directory
   if (overwrite) {
     if (any(is.null(pki_file), is.null(ca_file))) {
@@ -49,7 +50,10 @@ pki_enable_httr <- function(mypki_file = NULL,
 
 #' @import openssl
 #' @importFrom getPass getPass
-set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
+set_httr_config <- function(ca_file = NULL,
+                            pki_file = NULL,
+                            pass = NULL) {
+
   # reuse pki passphrase if user has previously entered it
   if (!is.null(pass))
     options('rpki_password' = pass)

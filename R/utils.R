@@ -142,15 +142,11 @@ get_pki_cert <- function(pki_file, password) {
   password <- shQuote(password)
   pki_file <- shQuote(pki_file)
 
+  # extract certificate and write to a temporary file
   cert_file <- tempfile()
-  system2('openssl', args = c('pkcs12',
-                              '-in', pki_file,
-                              '-out', cert_file,
-                              '-clcerts', '-nokeys', '-nomacver',
-                              '-passin', paste0('pass:', password)),
-          stdout = NULL,
-          stderr = NULL)
-  # write certificate to temp file
+  p12 <- openssl::read_p12(file=pki_file, password=password)
+  openssl::write_pem(p12$cert, path=cert_file)
+
   options('rpki_cert' = cert_file)
   return(cert_file)
 }
@@ -160,32 +156,17 @@ get_pki_key <- function(pki_file, password) {
   if(!is.null(key_file))
     return(key_file)
 
-  # wrap password and pki filename in quotes in case white space or special characters exist
+  # wrap password and pki filename in quotes in case of
+  # white space or special characters exist
   password <- shQuote(password)
   pki_file <- shQuote(pki_file)
 
-  # write certificate to temp file
-  # convert pki to pem format (encrypted)
-  tmp <- tempfile()
-  system2('openssl', args = c('pkcs12',
-                              '-in', pki_file,
-                              '-out', tmp,
-                              '-nocerts', '-nomacver',
-                              '-passin', paste0('pass:', password),
-                              '-passout', paste0('pass:', password)),
-          stdout = NULL,
-          stderr = NULL)
-
+  # convert pki to pem format and
   # create encrypted RSA key file in PKCS#1 format
   key_file <- tempfile()
-  system2('openssl', args = c('rsa',
-                              '-in', tmp,
-                              '-out', key_file,
-                              '-des',
-                              '-passin', paste0('pass:', password),
-                              '-passout', paste0('pass:', password)),
-          stdout = NULL,
-          stderr = NULL)
+  p12 <- openssl::read_p12(file=pki_file, password=password)
+  openssl::write_pkcs1(p12$key, path=key_file, password=password)
+
   options('rpki_key' = key_file)
   return(key_file)
 }
@@ -194,7 +175,7 @@ get_pki_key <- function(pki_file, password) {
 get_pki_password <- function() {
   p <- getOption('rpki_password')
   if(is.null(p)) {
-    p <- getPass('Enter PKI Password: ')
+    p <- getPass::getPass('Enter PKI Password: ')
     options('rpki_password' = p)
   }
   return(p)

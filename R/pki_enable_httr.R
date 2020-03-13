@@ -20,26 +20,26 @@
 #' library(rpki)
 #' pki_eable_httr(password = "my_pki_passphrase")
 #' GET("http://httpbin.org/")
-#'
 pki_enable_httr <- function(mypki_file = NULL,
-                               pki_file = NULL,
-                               ca_file = NULL,
-                               password = NULL,
-                               overwrite = FALSE) {
-
+                            pki_file = NULL,
+                            ca_file = NULL,
+                            password = NULL,
+                            overwrite = FALSE) {
   dependency_check()
 
   mypki_file <- ifelse(is.null(mypki_file), get_config_path(), mypki_file) # defaults to home directory
   if (overwrite) {
     if (any(is.null(pki_file), is.null(ca_file))) {
       create_mypki(file = mypki_file)
-    } else
+    } else {
       write_mypki(mypki_file = mypki_file, ca_file = ca_file, pki_file = pki_file)
+    }
   }
   # read from pre-existing mypki file
   valid <- is_valid_mypki(file = mypki_file, password = password)
-  if (!valid)
-    stop(paste0('Invalid mypki configuration file at ', mypki_file))
+  if (!valid) {
+    stop(paste0("Invalid mypki configuration file at ", mypki_file))
+  }
   json_data <- jsonlite::fromJSON(txt = mypki_file)
 
   # clean up the configuration environment when session ends
@@ -54,8 +54,9 @@ pki_enable_httr <- function(mypki_file = NULL,
 #' @importFrom getPass getPass
 set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
   # reuse pki passphrase if user has previously entered it
-  if (!is.null(pass))
-    options('rpki_password' = pass)
+  if (!is.null(pass)) {
+    options("rpki_password" = pass)
+  }
   pass <- get_pki_password()
 
   # keep cert and private key in encrypted temp files for continued use during the session
@@ -69,8 +70,10 @@ set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
   #   sslcert: certificate file (.pem)
   #   sslkey: keyfile (.key but PEM formatted)
   #   keypasswd: pki passphrase
-  httr::set_config(httr::config(cainfo = ca_file,
-                                sslcert = cert_file,
-                                sslkey = rsa_key_file,
-                                keypasswd = pass))
+  httr::set_config(httr::config(
+    cainfo = ca_file,
+    sslcert = cert_file,
+    sslkey = rsa_key_file,
+    keypasswd = pass
+  ))
 }

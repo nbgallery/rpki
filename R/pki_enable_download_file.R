@@ -59,7 +59,6 @@ set_download_file_config <- function(ca_file = NULL, pki_file = NULL, pass = NUL
     options("rpki_password" = pass)
   }
   pass <- get_pki_password()
-
   # keep cert and private key in encrypted temp files for continued use during the session
   cert_file <- get_pki_cert(pki_file, pass)
   rsa_key_file <- get_pki_key(pki_file, pass)

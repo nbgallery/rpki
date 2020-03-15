@@ -32,11 +32,9 @@ package_cleanup <- function() {
   # clean up the httr options that were set
   if (isNamespaceLoaded("httr")) httr::reset_config()
   options("httr_config" = NULL)
-
   # restore download.file settings to original values
   options("download.file.method" = getOption("rpki_backup_download.file.method"))
   options("download.file.extra" = getOption("rpki_backup_download.file.extra"))
-
   # remove pki password from memory
   options("rpki_password" = NULL)
 }

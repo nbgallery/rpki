@@ -40,12 +40,10 @@ get_config_path <- function() {
   if (!is.null(p)) {
     return(p)
   }
-
   p <- home_config_path()
   if (!is.null(p)) {
     return(p)
   }
-
   warning("Could not find MYPKI_CONFIG or HOME environment variables. If you are on Windows, you need to add a MYPKI_CONFIG environment variable in the Control Panel.")
 }
 
@@ -58,12 +56,10 @@ create_mypki <- function(file) {
     ca_file <- stringr::str_trim(ca_file)
     pki_file <- readline(prompt = "Enter full file path to PKI certificate file: ")
     pki_file <- stringr::str_trim(pki_file)
-
     write_mypki(mypki_file = file, ca_file = ca_file, pki_file = pki_file)
     if (is_valid_mypki(file = file)) {
       return(TRUE)
     }
-
     try <- try + 1
     if (try >= max_tries) {
       file.remove(file)
@@ -149,16 +145,13 @@ get_pki_cert <- function(pki_file, password) {
   if (!is.null(cert_file)) {
     return(cert_file)
   }
-
   # wrap password and pki filename in quotes in case white space or special characters exist
   password <- shQuote(password)
   pki_file <- shQuote(pki_file)
-
   # extract certificate and write to a temporary file
   cert_file <- tempfile()
   p12 <- openssl::read_p12(file = pki_file, password = password)
   openssl::write_pem(p12$cert, path = cert_file)
-
   options("rpki_cert" = cert_file)
   return(cert_file)
 }
@@ -168,18 +161,13 @@ get_pki_key <- function(pki_file, password) {
   if (!is.null(key_file)) {
     return(key_file)
   }
-
-  # wrap password and pki filename in quotes in case of
-  # white space or special characters exist
+  # wrap password and pki filename in quotes in case white space or special characters exist
   password <- shQuote(password)
   pki_file <- shQuote(pki_file)
-
-  # convert pki to pem format and
-  # create encrypted RSA key file in PKCS#1 format
+  # convert pki to pem format and create encrypted RSA key file in PKCS#1 format
   key_file <- tempfile()
   p12 <- openssl::read_p12(file = pki_file, password = password)
   openssl::write_pkcs1(p12$key, path = key_file, password = password)
-
   options("rpki_key" = key_file)
   return(key_file)
 }

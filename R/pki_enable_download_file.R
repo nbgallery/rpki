@@ -70,6 +70,17 @@ set_download_file_config <- function(ca_file = NULL, pki_file = NULL, pass = NUL
   #   cert: certificate file (PEM format)
   #   key: keyfile (PEM format)
   #   pass: pki passphrase
+
+  # ALTERNATIVE option: set linux environment variables
+  # see https://www.php.net/manual/en/function.curl-setopt.php
+  #   set CURL_CA_BUNDLE
+  #   --cacert = CURLOPT_CAPATH environment var
+  #   CURLOPT_KEYPASSWD     - The password required to use the CURLOPT_SSLKEY or CURLOPT_SSH_PRIVATE_KEYFILE private key.
+  #   CURLOPT_SSLCERT	      - The name of a file containing a PEM formatted certificate.
+  #   CURLOPT_SSLCERTPASSWD - The password required to use the CURLOPT_SSLCERT certificate.
+  #   CURLOPT_SSLKEY        - The name of a file containing a private SSL key.
+  #   CURLOPT_SSLKEYPASSWD  - The secret password needed to use the private SSL key specified in CURLOPT_SSLKEY.
+  #   CURLOPT_VERBOSE       - set to 1 for verbose output, 0 to disable
   options(download.file.method = "curl")
   options(download.file.extra = paste(
     "--cacert", ca_file,

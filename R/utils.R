@@ -1,11 +1,6 @@
 # check for external software dependencies
 dependency_check <- function() {
-  prog <- Sys.which("openssl")
-  if (!file.exists(prog)) {
-    stop("ERROR: Unable to locate openssl executable. Openssl is not installed or not on the search path.")
-  }
-  prog <- Sys.which("curl")
-  if (!file.exists(prog)) {
+  if (nzchar(Sys.which("curl"))) {
     stop("ERROR: Unable to locate curl executable. Curl is not installed or not on the search path.")
   }
 }

@@ -1,6 +1,6 @@
 # check for external software dependencies
 dependency_check <- function() {
-  if (nzchar(Sys.which("curl"))) {
+  if (!nzchar(Sys.which("curl"))) {
     stop("ERROR: Unable to locate curl executable. Curl is not installed or not on the search path.")
   }
 }

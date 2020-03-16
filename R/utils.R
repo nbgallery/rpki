@@ -137,12 +137,9 @@ is_valid_mypki <- function(file, password = NULL) {
 # input: file path to a pkcs#12 file
 get_pki_cert <- function(pki_file, password) {
   cert_file <- getOption("rpki_cert")
-  if (!is.null(cert_file)) {
+  if (!is.null(cert_file) & file.exists(cert_file)) {
     return(cert_file)
   }
-  # wrap password and pki filename in quotes in case white space or special characters exist
-  password <- shQuote(password)
-  pki_file <- shQuote(pki_file)
   # extract certificate and write to a temporary file
   cert_file <- tempfile()
   p12 <- openssl::read_p12(file = pki_file, password = password)
@@ -153,12 +150,9 @@ get_pki_cert <- function(pki_file, password) {
 
 get_pki_key <- function(pki_file, password) {
   key_file <- getOption("rpki_key")
-  if (!is.null(key_file)) {
+  if (!is.null(key_file) & file.exists(key_file)) {
     return(key_file)
   }
-  # wrap password and pki filename in quotes in case white space or special characters exist
-  password <- shQuote(password)
-  pki_file <- shQuote(pki_file)
   # convert pki to pem format and create encrypted RSA key file in PKCS#1 format
   key_file <- tempfile()
   p12 <- openssl::read_p12(file = pki_file, password = password)

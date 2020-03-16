@@ -1,0 +1,9 @@
+Name: PKI-enable install.packages()
+Description: setup install.packages() with pki authentication
+Binding: addin_pki_enable_download_file
+Interactive: true
+
+Name: PKI-enable httr
+Description: setup httr config options for pki authentication
+Binding: addin_pki_enable_httr
+Interactive: true

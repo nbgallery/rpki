@@ -50,6 +50,31 @@ pki_enable_httr <- function(mypki_file = NULL,
 }
 
 
+addin_pki_enable_httr <- function() {
+  continue <- rstudioapi::showQuestion("rpki", "Please select your PKI certificate (*.p12)")
+  if (continue) {
+    p12_file <- rstudioapi::selectFile(
+      caption = "PKI File",
+      label = "Select",
+      path = rstudioapi::getActiveProject(),
+      filter = "*.p12",
+      existing = TRUE
+    )
+    print(p12_file)
+  }
+  continue <- rstudioapi::showQuestion("rpki", "Please select your Certificate Authority (CA) bundle (*.crt)")
+  if (continue) {
+    ca_file <- rstudioapi::selectFile(
+      caption = "CA Bundle",
+      label = "Select",
+      path = rstudioapi::getActiveProject(),
+      filter = "*.crt",
+      existing = TRUE
+    )
+    print(ca_file)
+  }
+}
+
 #' @import openssl
 #' @importFrom getPass getPass
 set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {

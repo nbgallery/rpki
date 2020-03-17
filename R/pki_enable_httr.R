@@ -46,7 +46,7 @@ pki_enable_httr <- function(mypki_file = NULL,
   reg.finalizer(globalenv(), environment_cleanup, onexit = TRUE)
 
   # make httr configuration changes
-  set_httr_config(ca_file = json_data$ca, pki_file = json_data$p12$path, pass = password)
+  set_httr_config(ca_file = json_data$ca, pki_file = json_data$p12$path, pass = password, force = overwrite)
 }
 
 
@@ -60,7 +60,6 @@ addin_pki_enable_httr <- function() {
       filter = "*.p12",
       existing = TRUE
     )
-    print(p12_file)
   }
   continue <- rstudioapi::showQuestion("rpki", "Please select your Certificate Authority (CA) bundle (*.crt)")
   if (continue) {
@@ -71,18 +70,19 @@ addin_pki_enable_httr <- function() {
       filter = "*.crt",
       existing = TRUE
     )
-    print(ca_file)
   }
+  rpki::pki_enable_httr(pki_file = p12_file, ca_file = ca_file, overwrite = TRUE)
 }
+
 
 #' @import openssl
 #' @importFrom getPass getPass
-set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
+set_httr_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL, force = FALSE) {
   # reuse pki passphrase if user has previously entered it
   if (!is.null(pass)) {
     options("rpki_password" = pass)
   }
-  pass <- get_pki_password()
+  pass <- get_pki_password(force)
 
   # keep cert and private key in encrypted temp files for continued use during the session
   cert_file <- get_pki_cert(pki_file, pass)

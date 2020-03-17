@@ -47,13 +47,13 @@ pki_enable_download_file <- function(mypki_file = NULL,
   json_data <- jsonlite::fromJSON(txt = mypki_file)
 
   # make download.file configuration changes
-  set_download_file_config(ca_file = json_data$ca, pki_file = json_data$p12$path, pass = password)
+  set_download_file_config(ca_file = json_data$ca, pki_file = json_data$p12$path, pass = password, force = overwrite)
 }
 
 
 addin_pki_enable_download_file <- function() {
-  result <- rstudioapi::showQuestion("rpki", "Please select your PKI certificate (*.p12)")
-  if (result) {
+  continue <- rstudioapi::showQuestion("rpki", "Please select your PKI certificate (*.p12)")
+  if (continue) {
     p12_file <- rstudioapi::selectFile(
       caption = "PKI File",
       label = "Select",
@@ -61,7 +61,6 @@ addin_pki_enable_download_file <- function() {
       filter = "*.p12",
       existing = TRUE
     )
-    print(p12_file)
   }
   continue <- rstudioapi::showQuestion("rpki", "Please select your Certificate Authority (CA) bundle (*.crt)")
   if (continue) {
@@ -72,19 +71,19 @@ addin_pki_enable_download_file <- function() {
       filter = "*.crt",
       existing = TRUE
     )
-    print(ca_file)
   }
+  rpki::pki_enable_download_file(pki_file = p12_file, ca_file = ca_file, overwrite = TRUE)
 }
 
 
 #' @import openssl
 #' @importFrom getPass getPass
-set_download_file_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL) {
+set_download_file_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL, force = FALSE) {
   # get pki password, reuse the stored pki password if user has previously entered it
   if (!is.null(pass)) {
     options("rpki_password" = pass)
   }
-  pass <- get_pki_password()
+  pass <- get_pki_password(force)
   # keep cert and private key in encrypted temp files for continued use during the session
   cert_file <- get_pki_cert(pki_file, pass)
   rsa_key_file <- get_pki_key(pki_file, pass)

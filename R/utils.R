@@ -137,8 +137,10 @@ is_valid_mypki <- function(file, password = NULL) {
 # input: file path to a pkcs#12 file
 get_pki_cert <- function(pki_file, password) {
   cert_file <- getOption("rpki_cert")
-  if (!is.null(cert_file) & file.exists(cert_file)) {
-    return(cert_file)
+  if (!is.null(cert_file)) {
+    if (file.exists(cert_file)) {
+      return(cert_file)
+    }
   }
   # extract certificate and write to a temporary file
   cert_file <- tempfile()
@@ -150,8 +152,10 @@ get_pki_cert <- function(pki_file, password) {
 
 get_pki_key <- function(pki_file, password) {
   key_file <- getOption("rpki_key")
-  if (!is.null(key_file) & file.exists(key_file)) {
-    return(key_file)
+  if (!is.null(key_file)) {
+    if (file.exists(key_file)) {
+      return(key_file)
+    }
   }
   # convert pki to pem format and create encrypted RSA key file in PKCS#1 format
   key_file <- tempfile()
@@ -162,8 +166,12 @@ get_pki_key <- function(pki_file, password) {
 }
 
 # Ask for pki password and store it for reuse during the current session
-get_pki_password <- function() {
-  p <- getOption("rpki_password")
+get_pki_password <- function(force = FALSE) {
+  if (force) {
+    p <- NULL
+  } else {
+    p <- getOption("rpki_password")
+  }
   if (is.null(p)) {
     p <- getPass::getPass("Enter PKI Password: ")
     options("rpki_password" = p)

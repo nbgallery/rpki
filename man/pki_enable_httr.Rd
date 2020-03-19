@@ -4,19 +4,21 @@
 \alias{pki_enable_httr}
 \title{Set httr config parameters}
 \usage{
-pki_enable_httr(mypki_file = NULL, pki_file = NULL, ca_file = NULL,
-  password = NULL, overwrite = FALSE)
+pki_enable_httr(
+  pki_file = NULL,
+  ca_file = NULL,
+  password = NULL,
+  override = FALSE
+)
 }
 \arguments{
-\item{mypki_file}{string: absolute file path to save mypki configuration file. Defaults to the home directory}
+\item{pki_file}{string: file path to a pki certificate}
 
-\item{pki_file}{string: absolute file path to a pki certificate}
-
-\item{ca_file}{string: absolute file path to a Certificate Authority (CA) bundle}
+\item{ca_file}{string: file path to a Certificate Authority (CA) bundle}
 
 \item{password}{string: passphrase used to encrypt/decrypt the private key of the PKI certificate}
 
-\item{overwrite}{logical: force overwrite a pre-existing mypki configuration file if found. Defaults to FALSE}
+\item{override}{logical: force override of a pre-existing mypki configuration file if found. (Default: FALSE)}
 }
 \description{
 Override configuration settings used by the 'httr' package to allow working with PKI-enabled web services.
@@ -32,7 +34,6 @@ pki_enable_httr() # will prompt for passphrase
 GET("http://httpbin.org/")
 
 library(rpki)
-pki_eable_httr(password = "my_pki_passphrase")
+pki_enable_httr(pki_file = "my_pki.p12", ca_file = "my_ca.crt", password = "my_pki_passphrase")
 GET("http://httpbin.org/")
-
 }

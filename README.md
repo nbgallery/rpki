@@ -59,14 +59,13 @@ install.packages('my_private_package')
 ```
 
 ## Manual Configuration
-Configuration options can be explicitly defined in order to overwrite default settings (interactive or non-interactive mode).
+Configuration options can be explicitly defined in order to override default settings (interactive or non-interactive mode).
 ### Interactive Sessions
 ```r
 library(rpki)
-pki_enable_httr(mypki_file = '/path/to/new/pki/file',
-                   ca_bundle = '/path/to/certificate_authority.crt',
-                   pki_file  = '/path/to/my/pki.p12',
-                   overwrite = TRUE)
+pki_enable_httr(ca_bundle = '/path/to/certificate_authority.crt',
+                pki_file  = '/path/to/my/pki.p12',
+                override = TRUE)
 GET('https://your.pki.enabled.website/path/to/whatever')
 pki_enable_download_file() # will not prompt for password again
 install.packages('my_private_package')
@@ -74,11 +73,10 @@ install.packages('my_private_package')
 ### Non-interactive Sessions
 ```r
 library(rpki)
-pki_enable_httr(mypki_file = '/path/to/new/pki/file',
-                   ca_bundle = '/path/to/certificate_authority.crt',
-                   pki_file  = '/path/to/my/pki.p12',
-                   password  = 'my_pki_passphrase',
-                   overwrite = TRUE)
+pki_enable_httr(ca_bundle = '/path/to/certificate_authority.crt',
+                pki_file  = '/path/to/my/pki.p12',
+                password  = 'my_pki_passphrase',
+                override = TRUE)
 GET('https://your.pki.enabled.website/path/to/whatever')
 pki_enable_download_file() # will not prompt for password again
 install.packages('my_private_package')

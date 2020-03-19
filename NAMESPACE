@@ -3,5 +3,3 @@
 export(pki_enable_download_file)
 export(pki_enable_httr)
 import(httr)
-import(openssl)
-importFrom(getPass,getPass)

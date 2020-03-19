@@ -4,19 +4,21 @@
 \alias{pki_enable_download_file}
 \title{Set download.file parameters}
 \usage{
-pki_enable_download_file(mypki_file = NULL, pki_file = NULL,
-  ca_file = NULL, password = NULL, overwrite = FALSE)
+pki_enable_download_file(
+  pki_file = NULL,
+  ca_file = NULL,
+  password = NULL,
+  override = FALSE
+)
 }
 \arguments{
-\item{mypki_file}{string: absolute file path to save .mypki configuration file. Defaults to the home directory}
+\item{pki_file}{string: filepath to a pki certificate}
 
-\item{pki_file}{string: absolute file path to a pki certificate}
-
-\item{ca_file}{string: absolute file path to a Certificate Authority (CA) bundle}
+\item{ca_file}{string: filepath to a Certificate Authority (CA) bundle}
 
 \item{password}{string: passphrase used to encrypt/decrypt the PKI certificate}
 
-\item{overwrite}{logical: force overwrite a pre-existing mypki configuration file if found. Defaults to FALSE}
+\item{override}{logical: force overwrite a pre-existing mypki configuration file if found. (Default: FALSE)}
 }
 \description{
 Override default configuration settings used by \code{download.file()} to allow for PKI-enabled use of \code{install.packages()}.
@@ -31,11 +33,9 @@ If a mypki configuration file cannot be found, users are prompted for file paths
 \examples{
 library(rpki)
 pki_enable_download_file() # will prompt for passphrase
-download.file("https://httpbin.org/")
 install.packages("my_private_package")
 
 library(rpki)
-pki_enable_download_file(password = "my_pki_passphrase")
-GET("http://httpbin.org/")
+pki_enable_download_file(pki_file = "my_pki.p12", ca_file = "my_ca.crt", password = "my_pki_passphrase")
 install.packages("my_private_package")
 }

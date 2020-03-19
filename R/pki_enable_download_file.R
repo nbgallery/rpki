@@ -2,15 +2,15 @@
 #'
 #' Override default configuration settings used by \code{download.file()} to allow for PKI-enabled use of \code{install.packages()}.
 #'
-#' All arguments are optional. Default mypki configuration settings will be used unless otherwise specified. The PKI certificate file must be in PKCS#12 format. The arguments of \code{download.file()} are modified so that \code{method = "curl"} and the following extra curl command-line arguments are set: cacert, cert, key, pass. See \code{?download.file} for more information.
+#' Default mypki configuration settings will be used unless otherwise specified. The PKI certificate file must be in PKCS#12 format. The arguments of \code{download.file()} are modified so that \code{method = "curl"} and the following extra curl command-line arguments are set: cacert, cert, key, pass. See \code{?download.file} for more information.
 #'
-#' This download method requires curl to be installed and added to the PATH environment variable. This is already done for most Linux/Mac OS's.
+#' This download method requires curl to be installed and added to the PATH environment variable. This is already done for most Linux/Mac distributions.
 #'
-#' If a mypki configuration file cannot be found, users are prompted for file paths to both a PKI certificate and a Certificate Authority (CA) bundle.
+#' If a mypki configuration file cannot be found, users are prompted for filepaths to a PKI certificate and a Certificate Authority (CA) bundle.
 #' @param pki_file string: filepath to a pki certificate
 #' @param ca_file string: filepath to a Certificate Authority (CA) bundle
 #' @param password string: passphrase used to encrypt/decrypt the PKI certificate
-#' @param override logical: force overwrite a pre-existing mypki configuration file if found. (Default: FALSE)
+#' @param override logical: force overwrite a pre-existing mypki configuration file if found.
 #' @export
 #' @examples
 #' library(rpki)

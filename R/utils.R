@@ -11,48 +11,34 @@ write_mypki <- function(mypki_file, ca_file, pki_file) {
   write(jsonlite::toJSON(l, pretty = TRUE, auto_unbox = TRUE), file = mypki_file)
 }
 
-mypki_config_path <- function() {
+# return filepath to a .mypki file
+get_config_path <- function() {
+  # check for MYPKI_CONFIG environment variable
   d <- Sys.getenv("MYPKI_CONFIG")
   if (dir.exists(d)) {
-    paste0(d, .Platform$file.sep, "mypki_config")
-  } else {
-    return(NULL)
+    return(paste0(normalizePath(d), .Platform$file.sep, "mypki_config"))
   }
-}
 
-home_config_path <- function() {
+  # check for HOME environment variable
   d <- Sys.getenv("HOME")
   if (dir.exists(d)) {
-    return(paste0(d, .Platform$file.sep, ".mypki"))
-  } else {
-    return(NULL)
+    return(paste0(normalizePath(d), .Platform$file.sep, ".mypki"))
   }
-}
 
-# get default .mypki file path
-get_config_path <- function() {
-  p <- mypki_config_path()
-  if (!is.null(p)) {
-    return(p)
-  }
-  p <- home_config_path()
-  if (!is.null(p)) {
-    return(p)
-  }
-  warning("Could not find MYPKI_CONFIG or HOME environment variables. If you are on Windows, you need to add a MYPKI_CONFIG environment variable in the Control Panel.")
+  stop("Could not find MYPKI_CONFIG or HOME environment variables.")
 }
 
 # create a new .mypki file in JSON format at the specified file location
-create_mypki <- function(file) {
+interactive_create_mypki <- function(file) {
   max_tries <- 10 # prevent an infinite loop situation
   try <- 0
   repeat{
-    ca_file <- readline(prompt = "Enter full file path to Certificate Authority bundle (.crt): ")
-    ca_file <- stringr::str_trim(ca_file)
-    pki_file <- readline(prompt = "Enter full file path to PKI certificate file: ")
-    pki_file <- stringr::str_trim(pki_file)
+    ca_file <- readline(prompt = "Enter filepath to Certificate Authority bundle (.crt): ")
+    ca_file <- normalizePath(ca_file)
+    pki_file <- readline(prompt = "Enter filepath to PKI certificate file: ")
+    pki_file <- normalizePath(pki_file)
     write_mypki(mypki_file = file, ca_file = ca_file, pki_file = pki_file)
-    if (is_valid_mypki(file = file)) {
+    if (is_valid_mypki(file)) {
       return(TRUE)
     }
     try <- try + 1
@@ -61,13 +47,13 @@ create_mypki <- function(file) {
       stop("Max number of attempts made. Exiting.")
     }
   }
-  message(paste0("Created .mypki file at ", file))
+  message(paste0("Created mypki file at ", file))
 }
 
 
 # check for .mypki file existence and verify the file
 # has valid configuration parameters
-is_valid_mypki <- function(file, password = NULL) {
+is_valid_mypki <- function(file) {
   # check .mypki file path
   if (!file.exists(file)) {
     message(paste0(file, " not found."))
@@ -83,65 +69,70 @@ is_valid_mypki <- function(file, password = NULL) {
     }
   )
 
-  # check that a Certificate Authority bundle is specified in the .mypki file
+  # check if Certificate Authority bundle is declared in the mypki file
   if (!("ca" %in% names(json_data))) {
     message(paste0("Certifate Authority (CA) file not specified in ", file))
     return(FALSE)
   }
 
-  # check file path of Certificate Authority bundle
+  # check file existence of Certificate Authority bundle
   if (!(file.exists(json_data$ca))) {
     message(paste0("Cannot find Certifate Authority (CA) file. Expected at ", json_data$ca))
     return(FALSE)
   }
 
   # check file format of Certificate Authority bundle
-  if (length(read_cert_bundle(file = json_data$ca)) == 0) {
+  if (length(openssl::read_cert_bundle(file = json_data$ca)) == 0) {
     message("Unrecognized Certifate Authority (CA) file format.")
     return(FALSE)
   }
 
-  # check that a pki certificate is specified in the .mypki file
+  # check if pki certificate is declared in the mypki file
   if (!("p12" %in% names(json_data) && "path" %in% names(json_data$p12))) {
     message(paste0("PKI file not specified in ", file))
     return(FALSE)
   }
 
-  # check file path of pki certificate
+  # check file existence of pki certificate
   if (!file.exists(json_data$p12$path)) {
     message(paste0("PKI file not found. Expected at ", json_data$p12$path))
     return(FALSE)
   }
 
   # check file format and verify pki password
-  if (!is.null(password)) {
-    bad_password <- TRUE
-    if ((typeof(password) == "character") & (nchar(password) > 0)) {
-      tryCatch(
-        {
-          openssl::read_p12(file = json_data$p12$path, password = password)
-          bad_password <- FALSE
-        },
-        error = function(e) message("Incorrect password.")
-      )
-    } else {
-      message("Incorrect password format.")
+  passwd <- get_pki_password()
+  if (!is.null(passwd)) {
+    # check type conversion of passwd
+    if ((typeof(passwd) != "character") || (nchar(passwd) == 0)) {
+      package_cleanup()
+      stop("Incorrect password format.")
     }
-    if (bad_password) {
-      return(FALSE)
-    }
+    # try to unencrypt file with password
+    unlocked_p12 <- tryCatch(
+      {
+        openssl::read_p12(file = json_data$p12$path, password = passwd)
+      },
+      error = function(err) {
+        package_cleanup()
+        stop("Incorrect password.")
+      }
+    )
+  } else {
+    warning("pki password not available")
   }
-  TRUE
+
+  return(TRUE)
 }
 
-# input: file path to a pkcs#12 file
-get_pki_cert <- function(pki_file, password) {
+# input: filepath to a pkcs#12 file
+get_pki_cert <- function(pki_file) {
   cert_file <- getOption("rpki_cert")
   if (!is.null(cert_file)) {
     if (file.exists(cert_file)) {
       return(cert_file)
     }
   }
+  password <- get_pki_password()
   # extract certificate and write to a temporary file
   cert_file <- tempfile()
   p12 <- openssl::read_p12(file = pki_file, password = password)
@@ -150,13 +141,15 @@ get_pki_cert <- function(pki_file, password) {
   return(cert_file)
 }
 
-get_pki_key <- function(pki_file, password) {
+# input: filepath to a pkcs#12 file
+get_pki_key <- function(pki_file) {
   key_file <- getOption("rpki_key")
   if (!is.null(key_file)) {
     if (file.exists(key_file)) {
       return(key_file)
     }
   }
+  password <- get_pki_password()
   # convert pki to pem format and create encrypted RSA key file in PKCS#1 format
   key_file <- tempfile()
   p12 <- openssl::read_p12(file = pki_file, password = password)
@@ -167,14 +160,19 @@ get_pki_key <- function(pki_file, password) {
 
 # Ask for pki password and store it for reuse during the current session
 get_pki_password <- function(force = FALSE) {
-  if (force) {
-    p <- NULL
-  } else {
-    p <- getOption("rpki_password")
-  }
-  if (is.null(p)) {
+  p <- getOption("rpki_password")
+  if (any(is.null(p), force)) {
     p <- getPass::getPass("Enter PKI Password: ")
     options("rpki_password" = p)
   }
   return(p)
+}
+
+# Set pki password store it for reuse during the current session
+set_pki_password <- function(passwd) {
+  options("rpki_password" = passwd)
+}
+
+clear_pki_password <- function() {
+  options("rpki_password" = NULL)
 }

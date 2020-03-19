@@ -7,47 +7,57 @@
 #' This download method requires curl to be installed and added to the PATH environment variable. This is already done for most Linux/Mac OS's.
 #'
 #' If a mypki configuration file cannot be found, users are prompted for file paths to both a PKI certificate and a Certificate Authority (CA) bundle.
-#' @param mypki_file string: absolute file path to save .mypki configuration file. Defaults to the home directory
-#' @param pki_file string: absolute file path to a pki certificate
-#' @param ca_file string: absolute file path to a Certificate Authority (CA) bundle
+#' @param pki_file string: filepath to a pki certificate
+#' @param ca_file string: filepath to a Certificate Authority (CA) bundle
 #' @param password string: passphrase used to encrypt/decrypt the PKI certificate
-#' @param overwrite logical: force overwrite a pre-existing mypki configuration file if found. Defaults to FALSE
-#' @import httr
+#' @param override logical: force overwrite a pre-existing mypki configuration file if found. (Default: FALSE)
 #' @export
 #' @examples
 #' library(rpki)
 #' pki_enable_download_file() # will prompt for passphrase
-#' download.file("https://httpbin.org/")
 #' install.packages("my_private_package")
 #'
 #' library(rpki)
-#' pki_enable_download_file(password = "my_pki_passphrase")
-#' GET("http://httpbin.org/")
+#' pki_enable_download_file(pki_file = "my_pki.p12", ca_file = "my_ca.crt", password = "my_pki_passphrase")
 #' install.packages("my_private_package")
-pki_enable_download_file <- function(mypki_file = NULL,
-                                     pki_file = NULL,
+pki_enable_download_file <- function(pki_file = NULL,
                                      ca_file = NULL,
                                      password = NULL,
-                                     overwrite = FALSE) {
+                                     override = FALSE) {
   dependency_check()
 
-  mypki_file <- ifelse(is.null(mypki_file), get_config_path(), mypki_file) # defaults to home directory
-  if (overwrite) {
-    if (any(is.null(pki_file), is.null(ca_file))) {
-      create_mypki(file = mypki_file)
+  # manage password
+  if(override) clear_pki_password()
+  if(!is.null(password)) set_pki_password(password)
+
+  # convert filepaths to absolute filepaths
+  if(!is.null(ca_file)) ca_file <- normalizePath(ca_file)
+  if(!is.null(pki_file)) pki_file <- normalizePath(pki_file)
+
+  # create mypki file if necessary
+  mypki_file <- get_config_path() # defaults to home directory
+  if (override || !file.exists(mypki_file)) {
+    if (file.exists(mypki_file)) file.remove(mypki_file)
+    # pki_file and ca_file are required arguments if override is used
+    if (is.null(pki_file) || is.null(ca_file)) {
+      interactive_create_mypki(file = mypki_file)
     } else {
       write_mypki(mypki_file = mypki_file, ca_file = ca_file, pki_file = pki_file)
     }
   }
-  # read from pre-existing mypki file
-  valid <- is_valid_mypki(file = mypki_file, password = password)
-  if (!valid) {
+
+  # read from existing mypki file
+  valid <- is_valid_mypki(file = mypki_file)
+  if (!valid)
     stop(paste0("Invalid mypki configuration file at ", mypki_file))
-  }
-  json_data <- jsonlite::fromJSON(txt = mypki_file)
+
+  json_data <- jsonlite::fromJSON(mypki_file)
+
+  # clean up the configuration environment when session ends
+  reg.finalizer(globalenv(), environment_cleanup, onexit = TRUE)
 
   # make download.file configuration changes
-  set_download_file_config(ca_file = json_data$ca, pki_file = json_data$p12$path, pass = password, force = overwrite)
+  set_download_file_config(ca_file = json_data$ca, pki_file = json_data$p12$path)
 }
 
 
@@ -72,21 +82,17 @@ addin_pki_enable_download_file <- function() {
       existing = TRUE
     )
   }
-  rpki::pki_enable_download_file(pki_file = p12_file, ca_file = ca_file, overwrite = TRUE)
+  pki_enable_download_file(pki_file = p12_file, ca_file = ca_file, override = TRUE)
 }
 
 
-#' @import openssl
-#' @importFrom getPass getPass
-set_download_file_config <- function(ca_file = NULL, pki_file = NULL, pass = NULL, force = FALSE) {
-  # get pki password, reuse the stored pki password if user has previously entered it
-  if (!is.null(pass)) {
-    options("rpki_password" = pass)
-  }
-  pass <- get_pki_password(force)
+set_download_file_config <- function(ca_file = NULL, pki_file = NULL) {
+  # reuse pki passphrase if user has previously entered it
+  pass <- get_pki_password()
+
   # keep cert and private key in encrypted temp files for continued use during the session
-  cert_file <- get_pki_cert(pki_file, pass)
-  rsa_key_file <- get_pki_key(pki_file, pass)
+  cert_file <- get_pki_cert(pki_file)
+  rsa_key_file <- get_pki_key(pki_file)
 
   # set download.file options globally so they persist for the entire R session.
   # Args:
@@ -95,17 +101,6 @@ set_download_file_config <- function(ca_file = NULL, pki_file = NULL, pass = NUL
   #   cert: certificate file (PEM format)
   #   key: keyfile (PEM format)
   #   pass: pki passphrase
-
-  # ALTERNATIVE option: set linux environment variables
-  # see https://www.php.net/manual/en/function.curl-setopt.php
-  #   set CURL_CA_BUNDLE
-  #   --cacert = CURLOPT_CAPATH environment var
-  #   CURLOPT_KEYPASSWD     - The password required to use the CURLOPT_SSLKEY or CURLOPT_SSH_PRIVATE_KEYFILE private key.
-  #   CURLOPT_SSLCERT	      - The name of a file containing a PEM formatted certificate.
-  #   CURLOPT_SSLCERTPASSWD - The password required to use the CURLOPT_SSLCERT certificate.
-  #   CURLOPT_SSLKEY        - The name of a file containing a private SSL key.
-  #   CURLOPT_SSLKEYPASSWD  - The secret password needed to use the private SSL key specified in CURLOPT_SSLKEY.
-  #   CURLOPT_VERBOSE       - set to 1 for verbose output, 0 to disable
   options(download.file.method = "curl")
   options(download.file.extra = paste(
     "--cacert", ca_file,

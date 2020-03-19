@@ -17,16 +17,14 @@ environment_cleanup <- function(e) {
 }
 
 package_cleanup <- function() {
-  # remove pki certificate and key files
+  # delete temporary pki certificate and key files
   if (!is.null(getOption("httr_config"))) {
     if (length(getOption("httr_config")$options) > 0) {
-      result <- tryCatch({
-        f <- c(
-          getOption("httr_config")$options$sslcert,
-          getOption("httr_config")$options$sslkey
-        )
-        file.remove(f)
-      })
+      f <- c(
+        getOption("httr_config")$options$sslcert,
+        getOption("httr_config")$options$sslkey
+      )
+      try(file.remove(f), silent = TRUE)
     }
   }
   # clean up the httr options that were set

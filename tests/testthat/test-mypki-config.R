@@ -10,13 +10,6 @@ test_that("Verify whether or not a mypki file is valid", {
   expect_false(is_valid_mypki("sample_invalid_mypki.txt"))
 })
 
-test_that("Using a pre-existing mypki file to set httr_options", {
-  mypki <- "sample_valid_mypki.txt"
-  pki_enable_httr(password = p12.password)
-  expect_false(is.null(getOption("httr_config")))
-  httr::reset_config()
-})
-
 test_that("Force the creation of a new mypki file", {
   pki_enable_httr(
     pki_file = p12.file,

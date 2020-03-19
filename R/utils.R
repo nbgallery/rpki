@@ -28,29 +28,6 @@ get_config_path <- function() {
   stop("Could not find MYPKI_CONFIG or HOME environment variables.")
 }
 
-# create a new .mypki file in JSON format at the specified file location
-interactive_create_mypki <- function(file) {
-  max_tries <- 10 # prevent an infinite loop situation
-  try <- 0
-  repeat{
-    ca_file <- readline(prompt = "Enter filepath to Certificate Authority bundle (.crt): ")
-    ca_file <- normalizePath(ca_file)
-    pki_file <- readline(prompt = "Enter filepath to PKI certificate file: ")
-    pki_file <- normalizePath(pki_file)
-    write_mypki(mypki_file = file, ca_file = ca_file, pki_file = pki_file)
-    if (is_valid_mypki(file)) {
-      return(TRUE)
-    }
-    try <- try + 1
-    if (try >= max_tries) {
-      file.remove(file)
-      stop("Max number of attempts made. Exiting.")
-    }
-  }
-  message(paste0("Created mypki file at ", file))
-}
-
-
 # check for .mypki file existence and verify the file
 # has valid configuration parameters
 is_valid_mypki <- function(file) {
@@ -124,6 +101,58 @@ is_valid_mypki <- function(file) {
   return(TRUE)
 }
 
+# primary function that constructs a mypki file
+# will prompt the the user for input if necessary
+configure_mypki <- function(pki_file = NULL, ca_file = NULL, password = NULL, override = FALSE) {
+  # determine mypki file location
+  mypki_file <- get_config_path() # defaults to home directory
+
+  # override all settings?
+  if (override) {
+    # delete prior mypki settings if they exist
+    package_cleanup()
+    try(file.remove(mypki_file), silent = TRUE)
+  }
+
+  # is pki_file defined?
+  if (is.null(pki_file) && !is.null(getOption("rpki_pki_file"))) {
+    pki_file <- getOption("rpki_pki_file")
+  }
+  if (is.null(pki_file)) {
+    pki_file <- readline(prompt = "Enter filepath to PKI certificate file: ")
+  }
+  pki_file <- normalizePath(pki_file)
+
+  # is ca_file defined?
+  if (is.null(ca_file) && !is.null(getOption("rpki_ca_file"))) {
+    ca_file <- getOption("rpki_ca_file")
+  }
+  if (is.null(ca_file)) {
+    ca_file <- readline(prompt = "Enter filepath to Certificate Authority bundle (.crt): ")
+  }
+  ca_file <- normalizePath(ca_file)
+
+  # is password defined?
+  if (!is.null(password)) set_pki_password(password)
+  # otherwise get pki password from user
+  p <- get_pki_password()
+
+  # write mypki settings out to a file
+  write_mypki(mypki_file = mypki_file, ca_file = ca_file, pki_file = pki_file)
+
+  # read from existing mypki file
+  valid <- is_valid_mypki(file = mypki_file)
+  if (!valid) {
+    stop(paste0("Invalid mypki configuration file at: ", mypki_file))
+  }
+
+  # save filepaths to reuse later in the same session (they have now been verified)
+  options("rpki_pki_file" = pki_file)
+  options("rpki_ca_file" = ca_file)
+
+  return(mypki_file)
+}
+
 # input: filepath to a pkcs#12 file
 get_pki_cert <- function(pki_file) {
   cert_file <- getOption("rpki_cert")
@@ -158,7 +187,7 @@ get_pki_key <- function(pki_file) {
   return(key_file)
 }
 
-# Ask for pki password and store it for reuse during the current session
+# Ask for pki password and store for reuse during the current session
 get_pki_password <- function(force = FALSE) {
   p <- getOption("rpki_password")
   if (any(is.null(p), force)) {
@@ -171,8 +200,4 @@ get_pki_password <- function(force = FALSE) {
 # Set pki password store it for reuse during the current session
 set_pki_password <- function(passwd) {
   options("rpki_password" = passwd)
-}
-
-clear_pki_password <- function() {
-  options("rpki_password" = NULL)
 }

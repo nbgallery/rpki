@@ -18,17 +18,17 @@ pki_enable_download_file(
 
 \item{password}{string: passphrase used to encrypt/decrypt the PKI certificate}
 
-\item{override}{logical: force overwrite a pre-existing mypki configuration file if found. (Default: FALSE)}
+\item{override}{logical: force overwrite a pre-existing mypki configuration file if found.}
 }
 \description{
 Override default configuration settings used by \code{download.file()} to allow for PKI-enabled use of \code{install.packages()}.
 }
 \details{
-All arguments are optional. Default mypki configuration settings will be used unless otherwise specified. The PKI certificate file must be in PKCS#12 format. The arguments of \code{download.file()} are modified so that \code{method = "curl"} and the following extra curl command-line arguments are set: cacert, cert, key, pass. See \code{?download.file} for more information.
+Default mypki configuration settings will be used unless otherwise specified. The PKI certificate file must be in PKCS#12 format. The arguments of \code{download.file()} are modified so that \code{method = "curl"} and the following extra curl command-line arguments are set: cacert, cert, key, pass. See \code{?download.file} for more information.
 
-This download method requires curl to be installed and added to the PATH environment variable. This is already done for most Linux/Mac OS's.
+This download method requires curl to be installed and added to the PATH environment variable. This is already done for most Linux/Mac distributions.
 
-If a mypki configuration file cannot be found, users are prompted for file paths to both a PKI certificate and a Certificate Authority (CA) bundle.
+If a mypki configuration file cannot be found, users are prompted for filepaths to a PKI certificate and a Certificate Authority (CA) bundle.
 }
 \examples{
 library(rpki)
@@ -36,6 +36,8 @@ pki_enable_download_file() # will prompt for passphrase
 install.packages("my_private_package")
 
 library(rpki)
-pki_enable_download_file(pki_file = "my_pki.p12", ca_file = "my_ca.crt", password = "my_pki_passphrase")
+pki_enable_download_file(pki_file = "my_pki.p12",
+                         ca_file = "my_ca.crt",
+                         password = "my_pki_passphrase")
 install.packages("my_private_package")
 }

@@ -18,49 +18,25 @@
 #' install.packages("my_private_package")
 #'
 #' library(rpki)
-#' pki_enable_download_file(pki_file = "my_pki.p12", ca_file = "my_ca.crt", password = "my_pki_passphrase")
+#' pki_enable_download_file(pki_file = "my_pki.p12",
+#'                          ca_file = "my_ca.crt",
+#'                          password = "my_pki_passphrase")
 #' install.packages("my_private_package")
 pki_enable_download_file <- function(pki_file = NULL,
                                      ca_file = NULL,
                                      password = NULL,
                                      override = FALSE) {
   dependency_check()
-
-  # manage password
-  if(override) clear_pki_password()
-  if(!is.null(password)) set_pki_password(password)
-
-  # convert filepaths to absolute filepaths
-  if(!is.null(ca_file)) ca_file <- normalizePath(ca_file)
-  if(!is.null(pki_file)) pki_file <- normalizePath(pki_file)
-
-  # create mypki file if necessary
-  mypki_file <- get_config_path() # defaults to home directory
-  if (override || !file.exists(mypki_file)) {
-    if (file.exists(mypki_file)) file.remove(mypki_file)
-    # pki_file and ca_file are required arguments if override is used
-    if (is.null(pki_file) || is.null(ca_file)) {
-      interactive_create_mypki(file = mypki_file)
-    } else {
-      write_mypki(mypki_file = mypki_file, ca_file = ca_file, pki_file = pki_file)
-    }
-  }
-
-  # read from existing mypki file
-  valid <- is_valid_mypki(file = mypki_file)
-  if (!valid)
-    stop(paste0("Invalid mypki configuration file at ", mypki_file))
-
+  mypki_file <- configure_mypki(pki_file, ca_file, password, override)
   json_data <- jsonlite::fromJSON(mypki_file)
-
   # clean up the configuration environment when session ends
   reg.finalizer(globalenv(), environment_cleanup, onexit = TRUE)
-
   # make download.file configuration changes
   set_download_file_config(ca_file = json_data$ca, pki_file = json_data$p12$path)
 }
 
 
+# the associated addin function for RStudio users
 addin_pki_enable_download_file <- function() {
   continue <- rstudioapi::showQuestion("rpki", "Please select your PKI certificate (*.p12)")
   if (continue) {
@@ -89,7 +65,6 @@ addin_pki_enable_download_file <- function() {
 set_download_file_config <- function(ca_file = NULL, pki_file = NULL) {
   # reuse pki passphrase if user has previously entered it
   pass <- get_pki_password()
-
   # keep cert and private key in encrypted temp files for continued use during the session
   cert_file <- get_pki_cert(pki_file)
   rsa_key_file <- get_pki_key(pki_file)

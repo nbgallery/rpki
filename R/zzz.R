@@ -31,8 +31,8 @@ package_cleanup <- function() {
   if (isNamespaceLoaded("httr")) httr::reset_config()
   options("httr_config" = NULL)
   # restore download.file settings to original values
-  options("download.file.method" = getOption("rpki_backup_download.file.method"))
-  options("download.file.extra" = getOption("rpki_backup_download.file.extra"))
+  if (!is.null(getOption("rpki_backup_download.file.method"))) options("download.file.method" = getOption("rpki_backup_download.file.method"))
+  if (!is.null(getOption("rpki_backup_download.file.extra"))) options("download.file.extra" = getOption("rpki_backup_download.file.extra"))
   # erase rpki settings from memory
   options("rpki_ca_file" = NULL)
   options("rpki_pki_file" = NULL)

@@ -115,7 +115,7 @@ configure_mypki <- function(pki_file = NULL, ca_file = NULL, password = NULL, ov
   }
 
   # is pki_file defined?
-  if (is.null(pki_file) && !is.null(getOption("rpki_pki_file"))) {
+  if (is.null(pki_file) && !is.null(getOption("rpki_pki_file")) && file.exists(getOption("rpki_pki_file"))) {
     pki_file <- getOption("rpki_pki_file")
   }
   if (is.null(pki_file)) {
@@ -124,7 +124,7 @@ configure_mypki <- function(pki_file = NULL, ca_file = NULL, password = NULL, ov
   pki_file <- normalizePath(pki_file)
 
   # is ca_file defined?
-  if (is.null(ca_file) && !is.null(getOption("rpki_ca_file"))) {
+  if (is.null(ca_file) && !is.null(getOption("rpki_ca_file")) && file.exists(getOption("rpki_ca_file"))) {
     ca_file <- getOption("rpki_ca_file")
   }
   if (is.null(ca_file)) {
